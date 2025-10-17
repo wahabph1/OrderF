@@ -1,12 +1,31 @@
 /* ==========================================================
-// Frontend/src/App.css (UPDATED - All Styles and Responsiveness)
+// Frontend/src/App.css (FINAL RESPONSIVE STYLES)
 // ========================================================== */
 
-body {
+/* --- Global Reset and Base Styling --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+:root {
+    --primary-color: #007bff; /* Blue */
+    --secondary-color: #34495e; /* Dark Slate */
+    --success-color: #2ecc71; /* Green */
+    --danger-color: #e74c3c; /* Red */
+    --background-light: #f4f7f6;
+    --card-background: #ffffff;
+    --text-color-dark: #333;
+    --border-color: #e0e0e0;
+}
+
+* {
+    box-sizing: border-box;
     margin: 0;
-    background-color: #f4f7f6;
-    font-family: Arial, sans-serif;
-    color: #333;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif; /* Modern Font */
+    background-color: var(--background-light);
+    color: var(--text-color-dark);
 }
 
 .App {
@@ -15,26 +34,25 @@ body {
     flex-direction: column;
 }
 
+/* --- Main Content Area --- */
 .main-content-wrapper {
-    flex-grow: 1; /* Content area ko badhne dega */
+    flex-grow: 1; 
     width: 95%;
-    max-width: 1300px;
+    max-width: 1200px; /* Thoda chhota kiya */
     margin: 20px auto;
-    background: #fff;
+    background: var(--card-background);
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Halka shadow */
 }
 
-/* --- Header/Navbar Styles --- */
+/* --- Header/Navbar Styles (Styling kept clean) --- */
 .header {
-    background-color: #333;
+    background-color: var(--secondary-color);
     color: white;
-    padding: 15px 0;
-    border-bottom: 3px solid #007bff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    width: 100%; 
-    position: sticky; /* Sticky navbar */
+    padding: 12px 0;
+    border-bottom: 3px solid var(--primary-color);
+    position: sticky; 
     top: 0;
     z-index: 999;
 }
@@ -45,199 +63,178 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 15px; /* Thoda kam padding */
 }
 
 .brand-name {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #007bff; 
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    z-index: 1001; 
+    font-size: 1.3em; /* Chhota kiya */
+    font-weight: 700;
+    color: var(--primary-color); 
 }
 
 .nav-links {
     display: flex;
-    gap: 25px;
+    gap: 20px;
     list-style: none;
-    margin: 0;
-    padding: 0;
 }
 
 .nav-link {
     color: white;
     text-decoration: none;
-    font-size: 1em;
-    padding: 5px 0;
-    transition: color 0.3s, border-bottom 0.3s;
+    font-size: 0.95em; /* Chhota kiya */
+    padding: 3px 0;
 }
 
 .nav-link:hover, .nav-link.active {
-    color: #007bff; 
-    border-bottom: 2px solid #007bff;
+    color: var(--primary-color); 
+    border-bottom: 2px solid var(--primary-color);
 }
 
-/* --- Mobile Menu Styles (Hamburger) --- */
 .menu-toggle {
     display: none; 
     background: none;
     border: none;
     color: white;
-    font-size: 2em;
+    font-size: 1.5em; /* Chhota kiya */
     cursor: pointer;
-    z-index: 1001;
-    padding: 0;
 }
 
-.hamburger-icon, .close-icon {
-    display: block;
-    line-height: 1;
-}
-
-/* --- Footer Styles (Enhanced) --- */
+/* --- Footer Styles --- */
 .footer {
-    background-color: #333;
+    background-color: var(--secondary-color);
     color: #ccc;
-    padding: 40px 20px; /* Increased vertical padding */
+    padding: 20px; /* Thoda kam padding */
     text-align: center;
-    width: 100%;
-    margin-top: auto; /* Push footer to the bottom */
-    border-top: 3px solid #2c3e50;
+    margin-top: auto; 
 }
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    font-size: 1.1em; /* Increased font size */
-}
-
 
 /* --- Headings and Messages --- */
 .dashboard-heading {
-    margin-top: 30px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #ccc;
-    color: #2c3e50;
+    margin: 20px 0; /* Margin adjust kiya */
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+    color: var(--secondary-color);
+    font-size: 1.8em;
     text-align: center;
 }
 
-.status-message {
-    text-align: center;
-    margin-top: 20px;
+.order-count {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-color-dark);
 }
 
-.error-message {
-    color: #c0392b;
-    font-weight: bold;
-}
-
-.form-message {
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 4px;
-    font-weight: bold;
-    text-align: center;
-}
-.form-message.error-message {
-    background-color: #fceae9;
-}
-
-
-/* --- Form and Input Styles (Reused in Table and Modal) --- */
+/* --- Form and Input Styles --- */
 .form-container {
     padding: 20px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.form-container h3 {
+    font-size: 1.1em; /* Heading chhota kiya */
+    margin-bottom: 15px;
+}
+
+.form-container form {
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+    align-items: end;
 }
 
 .input-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
+    margin-bottom: 0; /* Remove extra margin */
 }
 
 .input-group label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #34495e;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: 0.9em;
 }
 
 input[type="text"],
 input[type="date"],
 select {
-    padding: 10px;
+    padding: 8px 10px; /* Padding kam kiya */
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 1em;
+    font-size: 0.95em; /* Font size kam kiya */
+    width: 100%;
 }
 
 
 /* --- Filter and Search --- */
 .filter-search-container {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     margin-bottom: 20px;
     flex-wrap: wrap; 
-    justify-content: center;
-    align-items: flex-end;
+    justify-content: space-between;
+    padding: 10px;
+    background: #fcfcfc;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
 }
 
 .filter-search-container .input-group {
     flex-grow: 1;
-    min-width: 200px;
+    min-width: 180px;
 }
 
 
 /* --- Table Styles --- */
 .table-wrapper {
     overflow-x: auto; 
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
 }
 
 .order-table {
     width: 100%;
-    border-collapse: collapse;
-    min-width: 700px;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 600px; /* Minimum width theek kiya */
 }
 
 .order-table th, .order-table td {
-    border: 1px solid #ddd;
-    padding: 12px 15px;
+    padding: 10px 12px; /* Padding kam kiya */
     text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9em; /* Font size kam kiya */
 }
 
 .order-table th {
-    background-color: #34495e;
-    color: white;
-}
-
-.order-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: #ebf5ff; /* Light header color */
+    color: var(--secondary-color);
+    font-weight: 700;
 }
 
 .order-table tr:hover {
-    background-color: #f1f1f1;
+    background-color: #f7f7f7;
 }
 
 
-/* --- Action Buttons --- */
+/* --- Action Buttons (Smaller and Cleaner) --- */
 .action-btn {
-    padding: 8px 12px;
+    padding: 6px 10px; /* Size kam kiya */
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
-    margin: 3px;
+    font-weight: 600;
+    margin: 2px;
+    font-size: 0.85em; /* Font size kam kiya */
     transition: background-color 0.2s;
 }
 
 .add-btn {
-    background-color: #2ecc71;
+    background-color: var(--success-color);
     color: white;
     width: 100%;
-    margin-top: 10px;
+    align-self: end;
 }
 .add-btn:hover { background-color: #27ae60; }
 
@@ -248,43 +245,43 @@ select {
 .edit-btn:hover { background-color: #2980b9; }
 
 .delete-btn {
-    background-color: #e74c3c;
+    background-color: var(--danger-color);
     color: white;
 }
 .delete-btn:hover { background-color: #c0392b; }
 
 .save-btn {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
-    width: 100%;
-    margin-top: 15px;
+    padding: 8px 15px;
+    font-size: 0.9em;
 }
 .save-btn:hover { background-color: #0056b3; }
 
 
 /* --- Status Tags --- */
 .status-tag {
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.85em;
+    padding: 4px 8px; /* Size kam kiya */
+    border-radius: 12px;
+    font-size: 0.75em; /* Font size kam kiya */
     font-weight: bold;
     color: white;
 }
 
-.status-pending { background-color: #f39c12; }
-.status-in-transit { background-color: #3498db; }
-.status-delivered { background-color: #2ecc71; }
-.status-cancelled { background-color: #e74c3c; }
+.status-Pending { background-color: #f39c12; }
+.status-In-Transit { background-color: #3498db; }
+.status-Delivered { background-color: var(--success-color); }
+.status-Cancelled { background-color: var(--danger-color); }
 
-
-/* --- Modal Styles --- */
+/* --- Modal Styles (Improved) --- */
 .modal-overlay {
+    /* ... (Same as before) ... */
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -293,35 +290,39 @@ select {
 
 .modal-content {
     background-color: white;
-    padding: 30px;
-    border-radius: 10px;
-    max-width: 500px;
+    padding: 25px; /* Padding kam kiya */
+    border-radius: 8px;
+    max-width: 400px; /* Size kam kiya */
     width: 90%;
-    position: relative;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    line-height: 1;
-    color: #aaa;
+.modal-content .input-group {
+    margin-bottom: 12px;
 }
 
-/* --- Mobile Responsiveness --- */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+
+/* --- Mobile Responsiveness (Updated) --- */
 @media (max-width: 768px) {
-    .filter-search-container {
-        flex-direction: column;
-        align-items: stretch;
+    .main-content-wrapper {
+        padding: 10px;
+        margin: 10px auto;
     }
 
-    .filter-search-container .input-group {
-        min-width: 100%;
+    .dashboard-heading {
+        font-size: 1.4em;
+    }
+    
+    .filter-search-container {
+        flex-direction: column;
+        gap: 10px;
     }
 
     /* Table horizontal scroll on small screens */
@@ -330,27 +331,31 @@ select {
     }
 
     .order-table {
-        min-width: 650px; /* Ensures columns don't crunch too much */
+        min-width: 550px; /* Table ko chhota kiya */
     }
 
-    /* Mobile: Side menu styles */
+    .action-btn {
+        padding: 5px 8px; /* Buttons aur chote kiye */
+        font-size: 0.8em;
+    }
+    
+    /* Mobile Menu Toggle */
     .menu-toggle {
         display: block; 
     }
-
+    
     .nav-links {
+        /* ... (Off-canvas styling same as before) ... */
         position: fixed;
         top: 0;
         right: 0;
-        width: 70%; 
-        max-width: 300px;
+        width: 60%; 
+        max-width: 250px;
         height: 100%;
         background-color: #2c3e50; 
         flex-direction: column;
-        padding: 80px 20px 20px;
-        gap: 15px;
-        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-        
+        padding: 70px 15px 15px;
+        gap: 12px;
         transform: translateX(100%);
         transition: transform 0.3s ease-out;
         z-index: 1000;
@@ -360,14 +365,4 @@ select {
         transform: translateX(0); 
     }
 
-    .nav-link {
-        border-bottom: 1px solid #4a6572;
-        padding: 10px 0;
-        width: 100%;
-    }
-    
-    .nav-link:hover, .nav-link.active {
-        color: #007bff;
-        border-bottom: 1px solid #007bff;
-    }
 }
