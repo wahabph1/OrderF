@@ -1,216 +1,413 @@
 /* ==========================================================
-// Frontend/src/App.css (FINAL TIGHTENED STYLES)
-// Padding aur Margin kam kar diye gaye hain.
-// ========================================================== */
-
-/* --- Global Reset and Base Styling --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
-:root {
-    --primary-color: #007bff; /* Blue */
-    --secondary-color: #34495e; /* Dark Slate */
-    --success-color: #2ecc71; /* Green */
-    --danger-color: #e74c3c; /* Red */
-    --background-light: #f4f7f6;
-    --card-background: #ffffff;
-    --text-color-dark: #333;
-    --border-color: #e0e0e0;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+   App.css — Modern, Responsive & Polished Design
+   ========================================================== */
 
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--background-light);
-    color: var(--text-color-dark);
+  margin: 0;
+  background-color: #f4f7f6;
+  font-family: "Poppins", Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
 }
 
 .App {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* --- Main Content Area (Padding Minimized) --- */
+/* =========================
+   Layout Wrappers
+   ========================= */
 .main-content-wrapper {
-    flex-grow: 1; 
-    width: 95%;
-    max-width: 1100px; /* Thoda aur chhota kiya */
-    margin: 10px auto; /* Margin kam kiya */
-    background: var(--card-background);
-    padding: 15px; /* Padding kam kiya */
-    border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  flex-grow: 1;
+  width: 95%;
+  max-width: 1200px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
 }
 
-/* --- Header/Navbar Styles --- */
+/* =========================
+   Header / Navbar
+   ========================= */
 .header {
-    background-color: var(--secondary-color);
-    color: white;
-    padding: 10px 0; /* Padding kam kiya */
-    border-bottom: 2px solid var(--primary-color);
-    position: sticky; 
-    top: 0;
-    z-index: 999;
+  background: #1e1e2f;
+  color: #fff;
+  padding: 15px 0;
+  border-bottom: 3px solid #007bff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 2000;
 }
 
 .navbar-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 10px; /* Padding kam kiya */
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
 }
 
-/* --- Headings and Messages --- */
+.brand-name {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #007bff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+}
+
+/* --- Mobile Navbar Toggle --- */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8em;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 70%;
+    max-width: 300px;
+    background-color: #2c3e50;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 80px 30px;
+    gap: 20px;
+    box-shadow: -3px 0 10px rgba(0, 0, 0, 0.3);
+    transform: translateX(100%);
+  }
+
+  .nav-links.open {
+    transform: translateX(0);
+    transition: transform 0.3s ease-out;
+  }
+
+  .nav-link {
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 8px;
+  }
+}
+
+/* =========================
+   Dashboard Headings & Messages
+   ========================= */
 .dashboard-heading {
-    margin: 15px 0; /* Margin kam kiya */
-    padding-bottom: 5px;
-    border-bottom: 1px solid var(--border-color);
-    font-size: 1.6em;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 25px;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+  font-weight: 600;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 8px;
 }
 
-.order-count {
-    font-size: 0.95rem;
-    margin-bottom: 8px; /* Margin kam kiya */
+.status-message {
+  text-align: center;
+  font-weight: 500;
+  margin-top: 10px;
 }
 
-/* --- Form and Input Styles (Very Tight) --- */
+.error-message {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* =========================
+   Forms & Inputs
+   ========================= */
 .form-container {
-    padding: 15px; /* Padding kam kiya */
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    margin-bottom: 15px; /* Margin kam kiya */
-}
-
-.form-container h3 {
-    font-size: 1.05em;
-    margin-bottom: 10px;
-}
-
-.form-container form {
-    display: grid;
-    gap: 10px; /* Gap kam kiya */
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
-    align-items: end;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #fafafa;
+  margin-bottom: 25px;
 }
 
 .input-group {
-    margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
 }
 
 .input-group label {
-    margin-bottom: 3px; /* Margin kam kiya */
-    font-size: 0.85em;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #34495e;
 }
 
 input[type="text"],
 input[type="date"],
 select {
-    padding: 7px 9px; /* Padding bahut kam kiya */
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 0.9em;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1em;
+  transition: border-color 0.3s;
 }
 
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #007bff;
+}
 
-/* --- Filter and Search (Tightened) --- */
+/* =========================
+   Filter & Search
+   ========================= */
 .filter-search-container {
-    gap: 10px; /* Gap kam kiya */
-    margin-bottom: 15px; /* Margin kam kiya */
-    padding: 10px;
-    border-radius: 4px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: 20px;
 }
 
 .filter-search-container .input-group {
-    min-width: 150px;
+  flex-grow: 1;
+  min-width: 200px;
 }
 
-
-/* --- Table Styles (Tightened) --- */
+/* =========================
+   Tables
+   ========================= */
 .table-wrapper {
-    overflow-x: auto; 
-    border-radius: 6px;
+  overflow-x: auto;
 }
 
 .order-table {
-    min-width: 500px; 
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
 }
 
-.order-table th, .order-table td {
-    padding: 8px 10px; /* Padding bahut kam kiya */
-    font-size: 0.85em; /* Font size chhota kiya */
+.order-table th,
+.order-table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: left;
 }
 
-/* --- Action Buttons (Smallest size) --- */
+.order-table th {
+  background: #007bff;
+  color: white;
+}
+
+.order-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.order-table tr:hover {
+  background: #eef5ff;
+}
+
+/* =========================
+   Buttons
+   ========================= */
 .action-btn {
-    padding: 5px 8px; /* Button size bahut kam kiya */
-    border-radius: 3px;
-    margin: 1px; /* Margin bahut kam kiya */
-    font-size: 0.8em; /* Font size chhota kiya */
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  margin: 3px;
 }
 
 .add-btn {
-    width: 100%;
-    margin-top: 5px; 
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+.add-btn:hover {
+  background-color: #27ae60;
+}
+
+.edit-btn {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.edit-btn:hover {
+  background-color: #2980b9;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
 }
 
 .save-btn {
-    padding: 7px 12px;
-    font-size: 0.85em;
+  background-color: #007bff;
+  color: #fff;
+  width: 100%;
 }
 
+.save-btn:hover {
+  background-color: #0056b3;
+}
 
-/* --- Status Tags --- */
+/* =========================
+   Status Tags
+   ========================= */
 .status-tag {
-    padding: 3px 6px; /* Size kam kiya */
-    border-radius: 10px;
-    font-size: 0.7em; /* Font size sabse chhota kiya */
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: bold;
+  color: white;
 }
 
-/* --- Modal Styles (Tightened) --- */
+.status-pending {
+  background-color: #f39c12;
+}
+
+.status-in-transit {
+  background-color: #3498db;
+}
+
+.status-delivered {
+  background-color: #2ecc71;
+}
+
+.status-cancelled {
+  background-color: #e74c3c;
+}
+
+/* =========================
+   Modal Styles
+   ========================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
 .modal-content {
-    padding: 20px; /* Padding kam kiya */
-    max-width: 350px; /* Size kam kiya */
-    width: 90%;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-.modal-content .input-group {
-    margin-bottom: 10px;
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #aaa;
+  cursor: pointer;
 }
 
-.modal-actions {
-    margin-top: 15px; /* Margin kam kiya */
+.close-btn:hover {
+  color: #000;
 }
 
+/* =========================
+   Footer
+   ========================= */
+.footer {
+  background-color: #1e1e2f;
+  color: #ccc;
+  padding: 30px 15px;
+  text-align: center;
+  width: 100%;
+  border-top: 3px solid #007bff;
+  margin-top: auto;
+}
 
-/* --- Mobile Responsiveness (Updated) --- */
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  font-size: 1.05em;
+}
+
+/* =========================
+   Responsive Tweaks
+   ========================= */
 @media (max-width: 768px) {
-    .main-content-wrapper {
-        padding: 8px;
-        margin: 8px auto;
-    }
+  .order-table {
+    min-width: 650px;
+  }
 
-    .dashboard-heading {
-        font-size: 1.2em;
-        margin: 10px 0;
-    }
-    
-    .filter-search-container {
-        gap: 8px;
-    }
+  .dashboard-heading {
+    font-size: 1.5em;
+  }
 
-    .order-table {
-        min-width: 450px; /* Table ko aur chhota kiya */
-    }
+  .footer {
+    padding: 20px 10px;
+    font-size: 0.9em;
+  }
 
-    .action-btn {
-        padding: 4px 6px; /* Buttons aur chote kiye */
-        font-size: 0.75em;
-    }
+  .main-content-wrapper {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-name {
+    font-size: 1.2em;
+  }
+
+  .action-btn {
+    font-size: 0.85em;
+    padding: 6px 10px;
+  }
 }
