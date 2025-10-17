@@ -185,7 +185,7 @@ main {
 }
 
 .order-table {
-    width: 50%;
+    width: 100%;
     border-collapse: collapse;
     background: #fff;
     border-radius: 10px;
@@ -264,7 +264,7 @@ main {
 .add-btn {
     background: #22c55e;
     color: white;
-    width: 20%;
+    width: 100%;
     margin-top: 1rem;
 }
 
