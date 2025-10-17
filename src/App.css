@@ -185,7 +185,7 @@ main {
 }
 
 .order-table {
-    width: 100%;
+    width: 50%;
     border-collapse: collapse;
     background: #fff;
     border-radius: 10px;
@@ -264,7 +264,7 @@ main {
 .add-btn {
     background: #22c55e;
     color: white;
-    width: 100%;
+    width: 20%;
     margin-top: 1rem;
 }
 
@@ -402,45 +402,6 @@ footer {
 
     .action-btn {
         padding: 0.3rem 0.7rem;
-        font-size: 0.8rem;
-    }
-}
-
-/* Table wrapper - allows horizontal scroll on small screens */
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: 10px;
-}
-
-/* Table styles */
-.order-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 600px; /* allow scroll if screen smaller */
-}
-
-.order-table th,
-.order-table td {
-    padding: 0.6rem 0.8rem; /* smaller padding for mobile */
-    text-align: left;
-    font-size: 0.85rem; /* smaller font on mobile */
-}
-
-/* Optional: wrap text in cells for very long content */
-.order-table td {
-    white-space: nowrap;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .order-table {
-        min-width: 500px; /* keeps columns readable, scroll appears */
-    }
-
-    .order-table th,
-    .order-table td {
-        padding: 0.5rem 0.6rem;
         font-size: 0.8rem;
     }
 }
