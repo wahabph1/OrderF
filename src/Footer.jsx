@@ -1,26 +1,21 @@
 // Frontend/src/components/Footer.jsx
-
 import React from 'react';
 
 function Footer() {
-    // Apne hisaab se details change kar lein
-    const developerName = "Abdul wahab shaikh"; 
+    const developerName = "Abdul Wahab Shaikh";
     const contactEmail = "aw599822@gmail.com";
-    // const githubLink = "https://github.com/YourUsername";
 
     return (
         <footer style={footerStyle}>
             <div style={containerStyle}>
-                <p style={textStyle}>
-                    Order Tracking System (OTS)
-                </p>
-                <p style={detailStyle}>
-                    Developed by: **{developerName}**
-                </p>
+                <p style={titleStyle}>Order Tracking System (OTS)</p>
+
+                <p style={detailStyle}>Developed by: <strong>{developerName}</strong></p>
+
                 <p style={detailStyle}>
                     Contact: <a href={`mailto:${contactEmail}`} style={linkStyle}>{contactEmail}</a>
                 </p>
-             
+
                 <p style={copyrightStyle}>
                     &copy; {new Date().getFullYear()} All rights reserved.
                 </p>
@@ -29,13 +24,13 @@ function Footer() {
     );
 }
 
-// Simple Inline CSS for the Footer
+// Inline CSS
 const footerStyle = {
-    backgroundColor: '#333',
-    color: 'white',
-    padding: '20px 0',
-    marginTop: '50px', // Content aur footer ke beech space dene ke liye
-    borderTop: '5px solid #007bff',
+    background: 'linear-gradient(135deg, #1e293b, #111827)', // subtle dark gradient
+    color: '#f8f9fa',
+    padding: '30px 20px',
+    marginTop: '50px',
+    borderTop: '5px solid #2563eb', // blue top border
 };
 
 const containerStyle = {
@@ -44,28 +39,34 @@ const containerStyle = {
     textAlign: 'center',
 };
 
-const textStyle = {
-    fontSize: '1.2em',
-    fontWeight: 'bold',
-    marginBottom: '10px',
-    color: '#007bff', // Title ko blue colour diya
+const titleStyle = {
+    fontSize: '1.4em',
+    fontWeight: '700',
+    marginBottom: '12px',
+    color: '#38bdf8', // bright blue for title
 };
 
 const detailStyle = {
-    margin: '5px 0',
-    fontSize: '0.9em',
+    margin: '6px 0',
+    fontSize: '0.95em',
 };
 
 const linkStyle = {
-    color: '#f8f9fa',
+    color: '#60a5fa',
     textDecoration: 'none',
     transition: 'color 0.3s',
+    fontWeight: '500',
 };
 
 const copyrightStyle = {
-    marginTop: '15px',
+    marginTop: '18px',
     fontSize: '0.8em',
-    color: '#ccc',
+    color: '#94a3b8', // subtle gray
+};
+
+// Add hover effect for link
+linkStyle[':hover'] = {
+    color: '#38bdf8',
 };
 
 export default Footer;
