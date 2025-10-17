@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// 🔑 FIX: API URL ko naye Vercel backend se hardcode kiya gaya hai
+// 🔑 FIX: API URL aapke backend URL https://order-b.vercel.app se connect kiya gaya hai
 const API_URL = 'https://order-b.vercel.app/api/orders';
 const ownerOptions = ['Emirate Essentials', 'Ahsan', 'Habibi Tools'];
 

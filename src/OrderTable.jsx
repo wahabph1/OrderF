@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import OrderForm from '../src/OrderForm'; 
-import EditOrderModal from '../src/EditOrderModal'; 
+import OrderForm from './OrderForm'; 
+import EditOrderModal from './EditOrderModal'; 
 
-// 🔑 FIX: API URL ko naye Vercel backend se hardcode kiya gaya hai
+// 🔑 FIX: API URL aapke backend URL https://order-b.vercel.app se connect kiya gaya hai
 const API_URL = 'https://order-b.vercel.app/api/orders';
 const ownerOptions = ['All', 'Emirate Essentials', 'Ahsan', 'Habibi Tools']; 
 const DEBOUNCE_DELAY = 300; 
