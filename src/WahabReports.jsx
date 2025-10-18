@@ -161,6 +161,96 @@ function WahabReports({ onClose }) {
                 </button>
             </div>
 
+            {/* Summary Stats Card */}
+            <div style={{
+                background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
+                color: 'white',
+                padding: '24px',
+                borderRadius: '16px',
+                marginBottom: '20px',
+                boxShadow: '0 10px 30px rgba(30, 41, 59, 0.3)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                gap: '20px'
+            }}>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>📦</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{counts.total}</div>
+                    <div style={{ fontSize: '12px', opacity: 0.8 }}>Total Orders</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>✅</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#22c55e' }}>{counts.delivered}</div>
+                    <div style={{ fontSize: '12px', opacity: 0.8 }}>Delivered</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>💰</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#fbbf24' }}>{(counts.delivered * 500).toLocaleString()}</div>
+                    <div style={{ fontSize: '12px', opacity: 0.8 }}>PKR Earned</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>📊</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#60a5fa' }}>{counts.total > 0 ? Math.round((counts.delivered / counts.total) * 100) : 0}%</div>
+                    <div style={{ fontSize: '12px', opacity: 0.8 }}>Success Rate</div>
+                </div>
+            </div>
+
+            {/* Earnings Card - Only show if delivered orders exist */}
+            {counts.delivered > 0 && (
+                <div style={{
+                    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                    color: 'white',
+                    padding: '20px',
+                    borderRadius: '12px',
+                    marginBottom: '20px',
+                    boxShadow: '0 8px 25px rgba(34, 197, 94, 0.3)',
+                    textAlign: 'center',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <div style={{
+                        position: 'absolute',
+                        top: '-50%',
+                        right: '-50%',
+                        width: '200%',
+                        height: '200%',
+                        background: 'rgba(255,255,255,0.1)',
+                        borderRadius: '50%',
+                        transform: 'rotate(45deg)'
+                    }} />
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                        <div style={{ 
+                            fontSize: '48px', 
+                            marginBottom: '8px',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}>
+                            💰
+                        </div>
+                        <div style={{ 
+                            fontSize: '14px', 
+                            opacity: 0.9,
+                            marginBottom: '4px'
+                        }}>
+                            Wahab Earnings
+                        </div>
+                        <div style={{ 
+                            fontSize: '32px', 
+                            fontWeight: 'bold',
+                            marginBottom: '4px',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}>
+                            {(counts.delivered * 500).toLocaleString()} PKR
+                        </div>
+                        <div style={{ 
+                            fontSize: '12px', 
+                            opacity: 0.8
+                        }}>
+                            {counts.delivered} Delivered Orders × 500 PKR
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="reports-grid">
                 <div className="donut-wrap">
                     <div className="donut-outer glow">
@@ -188,6 +278,15 @@ function WahabReports({ onClose }) {
                 <StatCard label="In Transit" value={counts.inTransit} color={colors.inTransit} />
                 <StatCard label="Delivered" value={counts.delivered} color={colors.delivered} />
                 <StatCard label="Cancelled" value={counts.cancelled} color={colors.cancelled} />
+                <div className="report-card" style={{ borderTopColor: '#22c55e', background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
+                    <div className="report-card-label">💰 Total Earnings</div>
+                    <div className="report-card-value" style={{ color: '#22c55e', fontSize: '18px', fontWeight: 'bold' }}>
+                        {(counts.delivered * 500).toLocaleString()} PKR
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '4px' }}>
+                        {counts.delivered} × 500 PKR
+                    </div>
+                </div>
             </div>
 
             <div className="bars-wrap">
