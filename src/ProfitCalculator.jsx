@@ -12,13 +12,22 @@ function ProfitCalculator() {
         deliveredOrders: ''
     });
     const [result, setResult] = useState(null);
-
-    const stores = [
+    const [showAddStore, setShowAddStore] = useState(false);
+    const [newStore, setNewStore] = useState({ name: '', color: '#2563eb' });
+    
+    // Initial stores - can be extended dynamically
+    const [stores, setStores] = useState([
         { id: 'metro', name: 'Metro Hardware Store', color: '#e11d48' },
         { id: 'emirate', name: 'Emirate Essentials', color: '#2563eb' },
         { id: 'habibi', name: 'Habibi Tools', color: '#16a34a' },
         { id: 'ahsan', name: 'Ahsan Store', color: '#dc2626' },
         { id: 'wahab', name: 'Wahab Business', color: '#7c3aed' }
+    ]);
+    
+    const colorOptions = [
+        '#e11d48', '#2563eb', '#16a34a', '#dc2626', '#7c3aed',
+        '#ea580c', '#0891b2', '#c2410c', '#7c2d12', '#4338ca',
+        '#be185d', '#059669', '#b91c1c', '#6366f1', '#9333ea'
     ];
 
     const handleStoreSelect = (store) => {
@@ -70,12 +79,45 @@ function ProfitCalculator() {
         setSelectedStore('');
         setShowForm(false);
         setResult(null);
+        setShowAddStore(false);
         setFormData({
             itemName: '',
             realPrice: '',
             deliveryCharges: '',
             deliveredOrders: ''
         });
+    };
+    
+    const handleAddStore = () => {
+        if (!newStore.name.trim()) {
+            alert('Please enter store name');
+            return;
+        }
+        
+        const storeId = newStore.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const store = {
+            id: storeId,
+            name: newStore.name,
+            color: newStore.color
+        };
+        
+        setStores(prev => [...prev, store]);
+        setNewStore({ name: '', color: '#2563eb' });
+        setShowAddStore(false);
+        alert(`Store "${newStore.name}" added successfully!`);
+    };
+    
+    const handleDeleteStore = (storeId) => {
+        // Don't allow deleting original stores
+        const originalStores = ['metro', 'emirate', 'habibi', 'ahsan', 'wahab'];
+        if (originalStores.includes(storeId)) {
+            alert('Cannot delete original stores');
+            return;
+        }
+        
+        if (window.confirm('Are you sure you want to delete this store?')) {
+            setStores(prev => prev.filter(s => s.id !== storeId));
+        }
     };
 
     return (
@@ -98,44 +140,81 @@ function ProfitCalculator() {
             </div>
 
             {/* Store Selection */}
-            {!showForm && (
+            {!showForm && !showAddStore && (
                 <div style={{ marginBottom: '30px' }}>
-                    <h2 style={{ 
-                        textAlign: 'center', 
-                        marginBottom: '30px', 
-                        color: '#1f2937', 
-                        fontSize: '24px' 
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        marginBottom: '30px' 
                     }}>
-                        Select Store
-                    </h2>
+                        <h2 style={{ 
+                            margin: 0,
+                            color: '#1f2937', 
+                            fontSize: '24px' 
+                        }}>
+                            Select Store
+                        </h2>
+                        <button
+                            onClick={() => setShowAddStore(true)}
+                            style={{
+                                background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '10px 20px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.target.style.transform = 'translateY(-1px)';
+                                e.target.style.boxShadow = '0 4px 12px rgba(22, 163, 74, 0.3)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.target.style.transform = 'translateY(0)';
+                                e.target.style.boxShadow = 'none';
+                            }}
+                        >
+                            <span style={{ fontSize: '16px' }}>+</span>
+                            Add Store
+                        </button>
+                    </div>
                     
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                         gap: '20px'
                     }}>
-                        {stores.map(store => (
-                            <button
-                                key={store.id}
-                                onClick={() => handleStoreSelect(store)}
-                                style={{
-                                    background: `linear-gradient(135deg, ${store.color}15 0%, ${store.color}25 100%)`,
-                                    border: `2px solid ${store.color}`,
-                                    borderRadius: '12px',
-                                    padding: '24px',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    textAlign: 'center'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.transform = 'translateY(-4px)';
-                                    e.target.style.boxShadow = `0 12px 30px ${store.color}40`;
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.transform = 'translateY(0)';
-                                    e.target.style.boxShadow = 'none';
-                                }}
-                            >
+                        {stores.map(store => {
+                            const isOriginalStore = ['metro', 'emirate', 'habibi', 'ahsan', 'wahab'].includes(store.id);
+                            return (
+                            <div key={store.id} style={{ position: 'relative' }}>
+                                <button
+                                    onClick={() => handleStoreSelect(store)}
+                                    style={{
+                                        background: `linear-gradient(135deg, ${store.color}15 0%, ${store.color}25 100%)`,
+                                        border: `2px solid ${store.color}`,
+                                        borderRadius: '12px',
+                                        padding: '24px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease',
+                                        textAlign: 'center',
+                                        width: '100%'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = 'translateY(-4px)';
+                                        e.target.style.boxShadow = `0 12px 30px ${store.color}40`;
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = 'translateY(0)';
+                                        e.target.style.boxShadow = 'none';
+                                    }}
+                                >
                                 <div style={{
                                     width: '50px',
                                     height: '50px',
@@ -167,7 +246,219 @@ function ProfitCalculator() {
                                     Calculate profit for {store.name.toLowerCase()}
                                 </p>
                             </button>
-                        ))}
+                            
+                            {/* Delete button for custom stores */}
+                            {!isOriginalStore && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteStore(store.id);
+                                    }}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '8px',
+                                        right: '8px',
+                                        background: '#ef4444',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        width: '24px',
+                                        height: '24px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    title="Delete Store"
+                                    onMouseEnter={(e) => {
+                                        e.target.style.background = '#dc2626';
+                                        e.target.style.transform = 'scale(1.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.background = '#ef4444';
+                                        e.target.style.transform = 'scale(1)';
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            )}
+                            </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+
+            {/* Add Store Form */}
+            {showAddStore && (
+                <div style={{
+                    background: 'white',
+                    borderRadius: '16px',
+                    padding: '32px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                    border: '3px solid #16a34a20',
+                    maxWidth: '500px',
+                    margin: '0 auto'
+                }}>
+                    <div style={{ 
+                        textAlign: 'center', 
+                        marginBottom: '30px',
+                        paddingBottom: '20px',
+                        borderBottom: '2px solid #16a34a20'
+                    }}>
+                        <h2 style={{ 
+                            margin: 0, 
+                            color: '#16a34a',
+                            fontSize: '24px',
+                            fontWeight: '600'
+                        }}>
+                            Add New Store
+                        </h2>
+                        <p style={{ margin: '8px 0 0', color: '#6b7280', fontSize: '14px' }}>
+                            Create a custom store for profit calculations
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'grid', gap: '24px' }}>
+                        {/* Store Name */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                marginBottom: '8px',
+                                fontWeight: '500',
+                                color: '#374151'
+                            }}>
+                                Store Name *
+                            </label>
+                            <input
+                                type="text"
+                                value={newStore.name}
+                                onChange={(e) => setNewStore(prev => ({ ...prev, name: e.target.value }))}
+                                placeholder="Enter store name"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 16px',
+                                    border: '2px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    fontSize: '16px',
+                                    outline: 'none',
+                                    boxSizing: 'border-box'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#16a34a'}
+                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                            />
+                        </div>
+
+                        {/* Store Color */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                marginBottom: '8px',
+                                fontWeight: '500',
+                                color: '#374151'
+                            }}>
+                                Store Theme Color
+                            </label>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(5, 1fr)',
+                                gap: '8px',
+                                marginBottom: '12px'
+                            }}>
+                                {colorOptions.map(color => (
+                                    <button
+                                        key={color}
+                                        onClick={() => setNewStore(prev => ({ ...prev, color }))}
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '8px',
+                                            background: color,
+                                            border: newStore.color === color ? '3px solid #374151' : '2px solid #e5e7eb',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            transform: newStore.color === color ? 'scale(1.1)' : 'scale(1)'
+                                        }}
+                                        title={color}
+                                    />
+                                ))}
+                            </div>
+                            <div style={{
+                                padding: '12px',
+                                background: `${newStore.color}15`,
+                                border: `1px solid ${newStore.color}40`,
+                                borderRadius: '8px',
+                                textAlign: 'center',
+                                fontSize: '14px',
+                                color: newStore.color,
+                                fontWeight: '500'
+                            }}>
+                                Preview: {newStore.name || 'Your Store Name'}
+                            </div>
+                        </div>
+
+                        {/* Buttons */}
+                        <div style={{ 
+                            display: 'flex', 
+                            gap: '16px', 
+                            justifyContent: 'center',
+                            marginTop: '20px'
+                        }}>
+                            <button
+                                onClick={handleAddStore}
+                                style={{
+                                    background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '14px 28px',
+                                    fontSize: '16px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                    e.target.style.boxShadow = '0 8px 20px rgba(22, 163, 74, 0.3)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.transform = 'translateY(0)';
+                                    e.target.style.boxShadow = 'none';
+                                }}
+                            >
+                                Add Store
+                            </button>
+                            
+                            <button
+                                onClick={() => {
+                                    setShowAddStore(false);
+                                    setNewStore({ name: '', color: '#2563eb' });
+                                }}
+                                style={{
+                                    background: 'white',
+                                    color: '#6b7280',
+                                    border: '2px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    padding: '14px 28px',
+                                    fontSize: '16px',
+                                    fontWeight: '500',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.borderColor = '#9ca3af';
+                                    e.target.style.color = '#374151';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.borderColor = '#e5e7eb';
+                                    e.target.style.color = '#6b7280';
+                                }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
