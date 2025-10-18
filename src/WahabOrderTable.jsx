@@ -95,37 +95,68 @@ function WahabOrderTable() {
     return (
         <div className="container">
             {/* Add Wahab Order Button */}
-            <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+            <div style={{ marginBottom: '16px', textAlign: 'right' }}>
                 <button
                     onClick={() => setShowAddModal(true)}
+                    className="add-order-btn"
                     style={{
-                        background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                        background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%)',
                         color: 'white',
                         border: 'none',
-                        borderRadius: '12px',
-                        padding: '16px 32px',
-                        fontSize: '18px',
-                        fontWeight: '600',
+                        borderRadius: '8px',
+                        padding: '10px 20px',
+                        fontSize: '14px',
+                        fontWeight: '500',
                         cursor: 'pointer',
-                        boxShadow: '0 8px 25px rgba(37, 99, 235, 0.3)',
-                        transform: 'translateY(0)',
-                        transition: 'all 0.3s ease',
+                        boxShadow: '0 4px 12px rgba(30, 64, 175, 0.25)',
+                        transform: 'translateY(0) scale(1)',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '12px',
-                        letterSpacing: '0.5px'
+                        gap: '8px',
+                        letterSpacing: '0.025em',
+                        position: 'relative',
+                        overflow: 'hidden'
                     }}
                     onMouseEnter={(e) => {
-                        e.target.style.transform = 'translateY(-2px)';
-                        e.target.style.boxShadow = '0 12px 30px rgba(29, 78, 216, 0.4)';
+                        e.target.style.transform = 'translateY(-1px) scale(1.02)';
+                        e.target.style.boxShadow = '0 8px 20px rgba(30, 64, 175, 0.35)';
+                        e.target.style.background = 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)';
                     }}
                     onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = '0 8px 25px rgba(37, 99, 235, 0.3)';
+                        e.target.style.transform = 'translateY(0) scale(1)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(30, 64, 175, 0.25)';
+                        e.target.style.background = 'linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%)';
+                    }}
+                    onMouseDown={(e) => {
+                        e.target.style.transform = 'translateY(0) scale(0.98)';
+                    }}
+                    onMouseUp={(e) => {
+                        e.target.style.transform = 'translateY(-1px) scale(1.02)';
                     }}
                 >
-                    <span style={{ fontSize: '20px' }}>+</span>
+                    <span style={{ 
+                        fontSize: '16px', 
+                        fontWeight: '300',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '16px',
+                        height: '16px'
+                    }}>+</span>
                     Add Wahab Order
+                    
+                    {/* Subtle shine effect */}
+                    <span style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: '-100%',
+                        width: '100%',
+                        height: '100%',
+                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                        transition: 'left 0.6s ease',
+                        pointerEvents: 'none'
+                    }} className="shine-effect" />
                 </button>
             </div>
 
