@@ -1,73 +1,39 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './styles/Dashboard.css';
 import OrderTable from './OrderTable';
-import Reports from './Reports';
-import ProfitCalculator from './ProfitCalculator';
 
-// Desktop-focused dashboard layout with left sidebar and right content
+// Light dashboard: left fixed analysis panel, right orders table (no buttons)
 export default function Dashboard() {
-  const [section, setSection] = useState('orders');
-
   return (
-    <div className="dash-shell">
-      <aside className="dash-sidebar">
-        <div className="dash-brand">Dashboard</div>
-        <nav className="dash-nav">
-          <button
-            className={`dash-link ${section === 'orders' ? 'active' : ''}`}
-            onClick={() => setSection('orders')}
-            aria-current={section === 'orders' ? 'page' : undefined}
-          >
-            Orders
-          </button>
-          <button
-            className={`dash-link ${section === 'reports' ? 'active' : ''}`}
-            onClick={() => setSection('reports')}
-            aria-current={section === 'reports' ? 'page' : undefined}
-          >
-            Reports
-          </button>
-          <button
-            className={`dash-link ${section === 'analysis' ? 'active' : ''}`}
-            onClick={() => setSection('analysis')}
-            aria-current={section === 'analysis' ? 'page' : undefined}
-          >
-            Analysis
-          </button>
-        </nav>
+    <div className="dash-shell dash-light">
+      <aside className="dash-sidebar dash-light">
+        <div className="analysis-sticky">
+          <h3 className="analysis-title">Analysis</h3>
+          <div className="analysis-grid">
+            <div className="analysis-card">
+              <div className="ac-label">Total Orders</div>
+              <div className="ac-value">—</div>
+            </div>
+            <div className="analysis-card">
+              <div className="ac-label">Delivered</div>
+              <div className="ac-value">—</div>
+            </div>
+            <div className="analysis-card">
+              <div className="ac-label">Pending</div>
+              <div className="ac-value">—</div>
+            </div>
+            <div className="analysis-card">
+              <div className="ac-label">In Transit</div>
+              <div className="ac-value">—</div>
+            </div>
+          </div>
+        </div>
       </aside>
 
       <section className="dash-content">
-        {section === 'orders' && (
-          <div className="dash-card">
-            <div className="dash-card-header">
-              <h2>Orders</h2>
-            </div>
-            <div className="dash-card-body">
-              <OrderTable />
-            </div>
-          </div>
-        )}
-        {section === 'reports' && (
-          <div className="dash-card">
-            <div className="dash-card-header">
-              <h2>Reports</h2>
-            </div>
-            <div className="dash-card-body">
-              <Reports />
-            </div>
-          </div>
-        )}
-        {section === 'analysis' && (
-          <div className="dash-card">
-            <div className="dash-card-header">
-              <h2>Analysis</h2>
-            </div>
-            <div className="dash-card-body">
-              <ProfitCalculator />
-            </div>
-          </div>
-        )}
+        <div className="orders-wrap">
+          <OrderTable />
+        </div>
       </section>
     </div>
   );
