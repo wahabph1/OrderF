@@ -12,10 +12,6 @@ function Footer() {
 
   return (
     <footer className="site-footer" role="contentinfo">
-      <div className="footer-cta">
-        <h3 className="footer-cta-title">Ready to streamline your orders?</h3>
-        <a className="cta-btn" href="#add-order">Add Order</a>
-      </div>
       <div className="footer-top">
         <div className="footer-grid">
           {/* Brand */}

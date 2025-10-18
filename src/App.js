@@ -8,6 +8,7 @@ import Navbar from '../src/Navbar';
 import SplashScreen from '../src/SplashScreen';
 import OrderForm from '../src/OrderForm';
 import Reports from '../src/Reports';
+import Profile from '../src/Profile';
 
 function App() {
     // Splash screen state
@@ -43,6 +44,8 @@ function App() {
                     <OrderTable />
                 ) : currentView === 'reports' ? (
                     <Reports />
+                ) : currentView === 'profile' ? (
+                    <Profile />
                 ) : (
                     <OrderForm onOrderAdded={() => {}} />
                 )}

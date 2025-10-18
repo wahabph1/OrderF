@@ -22,7 +22,11 @@ function Navbar({ onNavClick, currentView }) {
           onClick={() => handleNavClick('dashboard')}
           aria-label={`${projectName} home`}
         >
-          <span className="brand-logo" aria-hidden>TM</span>
+          <span className="brand-logo-wrap">
+            <span className="brand-logo nav-logo-pop" aria-hidden>TM</span>
+            <span className="logo-shine" aria-hidden></span>
+            <span className="logo-halo" aria-hidden></span>
+          </span>
           <span className="brand-name">{projectName}</span>
         </button>
 
@@ -62,6 +66,22 @@ function Navbar({ onNavClick, currentView }) {
             onClick={() => handleNavClick('reports')}
           >
             Reports
+          </button>
+
+          <button
+            type="button"
+            className={currentView === 'wahabOrders' ? 'nav-link active' : 'nav-link'}
+            onClick={() => handleNavClick('wahabOrders')}
+          >
+            Wahab Orders
+          </button>
+
+          <button
+            type="button"
+            className={currentView === 'qatarOrderDetails' ? 'nav-link active' : 'nav-link'}
+            onClick={() => handleNavClick('qatarOrderDetails')}
+          >
+            Qatar Order Details
           </button>
 
           <button

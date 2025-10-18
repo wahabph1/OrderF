@@ -36,49 +36,54 @@ function OrderForm({ onOrderAdded }) {
         }
     };
 
-    return (
-        <div className="form-container">
-            <h3>➕ Add New Order</h3>
-            <form onSubmit={handleSubmit}>
-                <div className="input-group">
-                    <label>Serial Number (Unique):</label>
-                    <input 
-                        type="text" 
-                        placeholder="Serial Number" 
-                        value={serialNumber} 
-                        onChange={(e) => setSerialNumber(e.target.value)} 
-                        required 
-                    />
-                </div>
-                
-                <div className="input-group">
-                    <label>Order Date:</label>
-                    <input 
-                        type="date" 
-                        value={orderDate} 
-                        onChange={(e) => setOrderDate(e.target.value)} 
-                        required 
-                    />
-                </div>
+    return (
+        <div className="form-container compact">
+            <h3>➕ Add New Order</h3>
+            <p className="form-subtle">Quick entry for a new serial number</p>
+            <form onSubmit={handleSubmit}>
+                <div className="form-grid">
+                    <div className="input-group">
+                        <label>Serial Number (Unique):</label>
+                        <input 
+                            type="text" 
+                            placeholder="Serial Number" 
+                            value={serialNumber} 
+                            onChange={(e) => setSerialNumber(e.target.value)} 
+                            required 
+                        />
+                    </div>
+                    
+                    <div className="input-group">
+                        <label>Order Date:</label>
+                        <input 
+                            type="date" 
+                            value={orderDate} 
+                            onChange={(e) => setOrderDate(e.target.value)} 
+                            required 
+                        />
+                    </div>
 
-                <div className="input-group">
-                    <label>Owner:</label>
-                    <select value={owner} onChange={(e) => setOwner(e.target.value)} required>
-                        {ownerOptions.map(o => (<option key={o} value={o}>{o}</option>))}
-                    </select>
-                </div>
+                    <div className="input-group">
+                        <label>Owner:</label>
+                        <select value={owner} onChange={(e) => setOwner(e.target.value)} required>
+                            {ownerOptions.map(o => (<option key={o} value={o}>{o}</option>))}
+                        </select>
+                    </div>
+                </div>
 
-                <button 
-                    type="submit" 
-                    className={`action-btn add-btn ${loading ? 'loading' : ''}`} 
-                    disabled={loading}
-                >
-                    {loading ? '' : '➕ Add Order'}
-                </button>
-            </form>
-            {message && <p className={`form-message ${message.startsWith('❌') ? 'error-message' : ''}`}>{message}</p>}
-        </div>
-    );
+                <div className="form-actions">
+                    <button 
+                        type="submit" 
+                        className={`action-btn add-btn ${loading ? 'loading' : ''}`} 
+                        disabled={loading}
+                    >
+                        {loading ? '' : '➕ Add Order'}
+                    </button>
+                </div>
+            </form>
+            {message && <p className={`form-message ${message.startsWith('❌') ? 'error-message' : ''}`}>{message}</p>}
+        </div>
+    );
 }
 
 export default OrderForm;

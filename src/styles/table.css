@@ -1,0 +1,134 @@
+:root {
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --accent: #2563eb;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --shadow: 0 10px 25px -10px rgba(2, 6, 23, 0.2);
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 12px; }
+
+/* Card wrapper */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Toolbar */
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.toolbar-left { display: flex; align-items: center; gap: 12px; }
+.toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+.kpi { display: inline-flex; align-items: baseline; gap: 8px; }
+.kpi-label { color: var(--muted); font-size: 12px; }
+.kpi-value { font-weight: 700; }
+
+.search {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  outline: none;
+}
+.search:focus { border-color: #94a3b8; box-shadow: 0 0 0 3px rgba(148,163,184,0.25); }
+
+.btn {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+.btn:hover { background: #f1f5f9; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(0.95); }
+.btn-light { background: #fff; }
+
+/* Responsive container for horizontal scroll */
+.table-responsive { overflow-x: auto; }
+
+/* Table */
+.table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  z-index: 1;
+  text-align: left;
+  padding: 12px 14px;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.table tbody td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.table tbody tr:hover { background: #f9fbff; }
+.table tbody tr:nth-child(even) { background: #fcfdfd; }
+
+/* Cell layouts */
+.cell-main { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #e2e8f0; display: grid; place-items: center;
+  font-weight: 700; color: #334155;
+}
+.cell-title { font-weight: 600; }
+.cell-sub { color: var(--muted); font-size: 12px; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+.badge-id { background: #f1f5f9; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--border); }
+
+/* Status badges */
+.status { padding: 6px 10px; border-radius: 999px; font-weight: 600; font-size: 12px; border: 1px solid transparent; }
+.status--processing { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+.status--shipped { background: #ecfeff; color: #0e7490; border-color: #a5f3fc; }
+.status--delivered { background: #ecfdf5; color: #15803d; border-color: #bbf7d0; }
+.status--cancelled { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+.status--pending { background: #fff7ed; color: #b45309; border-color: #fed7aa; }
+.status--in-transit { background: #eef2ff; color: #4338ca; border-color: #c7d2fe; }
+
+/* Footer */
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+}
+.muted { color: var(--muted); }
+.pagination { display: flex; align-items: center; gap: 8px; }
+
+/* Small screens: keep single-row layout with horizontal scroll */
+@media (max-width: 720px) {
+  .container { padding: 0 8px; }
+  .table-responsive { overflow-x: auto; }
+  .table { font-size: 13px; min-width: 680px; }
+  .table thead { display: table-header-group; }
+  .table tbody tr { display: table-row; }
+  .table tbody td { display: table-cell; white-space: nowrap; }
+}
+
+/* Icon button */
+.icon-btn { background: transparent; border: none; cursor: pointer; font-size: 16px; }
+.icon-btn:hover { transform: scale(1.05); }
