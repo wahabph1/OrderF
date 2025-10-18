@@ -12,6 +12,7 @@ import Profile from '../src/Profile';
 import WahabOrderTable from '../src/WahabOrderTable'; // Wahab component import
 import WahabLogin from '../src/WahabLogin'; // Wahab authentication
 import ProfitCalculator from '../src/ProfitCalculator'; // Profit Calculator
+import Dashboard from './Dashboard';
 
 function App() {
     // Splash screen state
@@ -76,9 +77,9 @@ function App() {
             <Navbar onNavClick={handleNavClick} currentView={currentView} />
 
             {/* 2. Main Content */}
-            <main>
+            <main className={currentView === 'dashboard' ? 'is-dashboard' : ''}>
                 {currentView === 'dashboard' ? (
-                    <OrderTable />
+                    <Dashboard />
                 ) : currentView === 'reports' ? (
                     <Reports />
                 ) : currentView === 'profile' ? (

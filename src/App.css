@@ -319,6 +319,13 @@ main {
     margin: auto;
 }
 
+/* Full-width layout when Dashboard is active */
+main.is-dashboard {
+    max-width: none;
+    width: 100%;
+    padding: 0;
+}
+
 /* ========================================================== */
 /* DASHBOARD HEADING / STATUS MESSAGES */
 /* ========================================================== */

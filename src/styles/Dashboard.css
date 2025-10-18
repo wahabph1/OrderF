@@ -1,0 +1,143 @@
+:root {
+  --bg: #0f1220;
+  --panel: rgba(255,255,255,0.06);
+  --panel-strong: rgba(255,255,255,0.12);
+  --text: #e6e7ee;
+  --muted: #aab0c0;
+  --brand: #6c7cff;
+  --accent: #4bd6b2;
+  --shadow: 0 10px 30px rgba(0,0,0,0.4);
+  --radius: 14px;
+}
+
+/* Shell: left sidebar + right content for desktop */
+.dash-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+  padding: 18px;
+  min-height: calc(100vh - 100px);
+  background: radial-gradient(1200px 600px at -10% -20%, #202642 0%, transparent 60%),
+              radial-gradient(1000px 500px at 110% 10%, #1a2436 0%, transparent 55%),
+              var(--bg);
+}
+
+/* Sidebar */
+.dash-sidebar {
+  position: sticky;
+  top: 18px;
+  align-self: start;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, var(--panel), rgba(255,255,255,0.03));
+  border: 1px solid var(--panel-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.dash-brand {
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.dash-nav {
+  display: grid;
+  gap: 8px;
+}
+
+.dash-link {
+  text-align: left;
+  padding: 12px 14px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: 200ms ease;
+  cursor: pointer;
+}
+
+.dash-link:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: var(--panel-strong);
+  color: var(--text);
+}
+
+.dash-link.active {
+  background: linear-gradient(180deg, rgba(108,124,255,0.25), rgba(108,124,255,0.12));
+  border-color: rgba(108,124,255,0.5);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 8px 18px rgba(108,124,255,0.25);
+}
+
+/* Content side */
+.dash-content {
+  display: grid;
+  align-content: start;
+}
+
+.dash-card {
+  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border: 1px solid var(--panel-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.dash-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--panel-strong);
+}
+
+.dash-card-header h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dash-card-body {
+  padding: 12px 14px;
+  color: var(--text);
+}
+
+/* Make tables look nicer inside */
+.dash-card-body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dash-card-body th,
+.dash-card-body td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  color: var(--text);
+}
+
+.dash-card-body tr:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+/* Desktop only: keep sidebar layout. On small screens, stack */
+@media (max-width: 1024px) {
+  .dash-shell {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .dash-sidebar {
+    position: static;
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+  }
+  .dash-nav {
+    grid-auto-flow: column;
+    overflow-x: auto;
+  }
+}
