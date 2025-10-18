@@ -20,6 +20,7 @@ function WahabOrderTable() {
     const [currentOrder, setCurrentOrder] = useState(null);
     const [showReports, setShowReports] = useState(false);
     const [editingStatusId, setEditingStatusId] = useState(null);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     // Fetch only Wahab orders
     const fetchWahabOrders = useCallback(async () => {
@@ -93,10 +94,42 @@ function WahabOrderTable() {
 
     return (
         <div className="container">
-            {/* Wahab Order Form */}
-            <WahabOrderForm onOrderAdded={handleRefresh} />
+            {/* Add Wahab Order Button */}
+            <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+                <button
+                    onClick={() => setShowAddModal(true)}
+                    style={{
+                        background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '12px',
+                        padding: '16px 32px',
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        boxShadow: '0 8px 25px rgba(37, 99, 235, 0.3)',
+                        transform: 'translateY(0)',
+                        transition: 'all 0.3s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        letterSpacing: '0.5px'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 12px 30px rgba(29, 78, 216, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 8px 25px rgba(37, 99, 235, 0.3)';
+                    }}
+                >
+                    <span style={{ fontSize: '20px' }}>+</span>
+                    Add Wahab Order
+                </button>
+            </div>
 
-            <div className="table-card" style={{ marginTop: 16 }}>
+            <div className="table-card">
               <div className="table-toolbar" style={{ 
                 overflowX: 'auto',
                 display: 'flex',
@@ -263,6 +296,100 @@ function WahabOrderTable() {
                         boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
                     }}>
                         <WahabReports onClose={() => setShowReports(false)} />
+                    </div>
+                </div>
+            )}
+
+            {/* Add Wahab Order Modal */}
+            {showAddModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.6)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px',
+                    animation: 'fadeIn 0.3s ease-out'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        maxWidth: '500px',
+                        width: '100%',
+                        maxHeight: '90vh',
+                        overflow: 'auto',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                        transform: 'scale(1)',
+                        animation: 'slideUp 0.3s ease-out'
+                    }}>
+                        {/* Modal Header */}
+                        <div style={{
+                            padding: '24px 24px 0',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <h2 style={{
+                                margin: 0,
+                                fontSize: '24px',
+                                fontWeight: '600',
+                                color: '#1f2937',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px'
+                            }}>
+                                <span style={{
+                                    background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                                    color: 'white',
+                                    width: '32px',
+                                    height: '32px',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '18px'
+                                }}>+</span>
+                                Add Wahab Order
+                            </h2>
+                            <button
+                                onClick={() => setShowAddModal(false)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '28px',
+                                    cursor: 'pointer',
+                                    color: '#9ca3af',
+                                    padding: '4px',
+                                    borderRadius: '6px',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = '#ef4444';
+                                    e.target.style.background = '#fef2f2';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = '#9ca3af';
+                                    e.target.style.background = 'none';
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        {/* Modal Body */}
+                        <div style={{ padding: '0 24px 24px' }}>
+                            <WahabOrderForm 
+                                onOrderAdded={() => {
+                                    handleRefresh();
+                                    setShowAddModal(false);
+                                }} 
+                            />
+                        </div>
                     </div>
                 </div>
             )}
