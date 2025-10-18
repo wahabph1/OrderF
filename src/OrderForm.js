@@ -73,7 +73,7 @@ function OrderForm({ onOrderAdded }) {
                     className={`action-btn add-btn ${loading ? 'loading' : ''}`} 
                     disabled={loading}
                 >
-                    {loading ? '' : 'Add Order'}
+                    {loading ? '' : '➕ Add Order'}
                 </button>
             </form>
             {message && <p className={`form-message ${message.startsWith('❌') ? 'error-message' : ''}`}>{message}</p>}

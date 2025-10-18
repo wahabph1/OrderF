@@ -339,7 +339,7 @@ main {
 }
 
 /* ========================================================== */
-/* ACTION BUTTONS WITH ANIMATIONS */
+/* ACTION BUTTONS WITH ENHANCED ANIMATIONS */
 /* ========================================================== */
 .action-btn {
     border: none;
@@ -352,19 +352,22 @@ main {
     margin-right: 0.5rem;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(0);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0) scale(1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
 .action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.1);
 }
 
 .action-btn:active {
-    transform: translateY(0) scale(0.98);
-    transition: all 0.1s ease;
+    transform: translateY(-1px) scale(0.95);
+    transition: all 0.15s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
 }
 
 .action-btn:disabled {
@@ -373,7 +376,7 @@ main {
     transform: none;
 }
 
-/* Ripple effect */
+/* Enhanced ripple effect with glow */
 .action-btn::before {
     content: '';
     position: absolute;
@@ -382,16 +385,43 @@ main {
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 70%, transparent 100%);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translate(-50%, -50%);
     z-index: 0;
+    opacity: 0;
+}
+
+.action-btn:hover::before {
+    width: 120px;
+    height: 120px;
+    opacity: 1;
 }
 
 .action-btn:active::before {
-    width: 300px;
-    height: 300px;
-    transition: width 0s, height 0s, top 0s, left 0s;
+    width: 200px;
+    height: 200px;
+    opacity: 0.8;
+    transition: all 0.3s ease-out;
+}
+
+/* Animated glow effect */
+.action-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.2) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.8s ease;
+    z-index: -1;
+}
+
+.action-btn:hover::after {
+    transform: translateX(100%);
 }
 
 .action-btn > * {
@@ -405,11 +435,15 @@ main {
     color: white;
     width: 100%;
     margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .add-btn:hover {
     background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
+    transform: translateY(-3px) scale(1.02);
+    animation: greenPulse 1.5s infinite;
 }
 
 .add-btn:active {
@@ -420,11 +454,13 @@ main {
 .edit-btn {
     background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
+    position: relative;
 }
 
 .edit-btn:hover {
     background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
+    box-shadow: 0 8px 25px rgba(56, 189, 248, 0.6);
+    animation: blueBounce 0.6s ease-in-out;
 }
 
 .edit-btn:active {
@@ -436,12 +472,13 @@ main {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     animation: none;
+    position: relative;
 }
 
 .delete-btn:hover {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
-    animation: shake 0.5s ease-in-out;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+    animation: shake 0.8s ease-in-out, redGlow 1s infinite alternate;
 }
 
 .delete-btn:active {
@@ -486,11 +523,11 @@ main {
     animation: spin 1s linear infinite;
 }
 
-/* Shake animation for delete button */
+/* Enhanced shake animation for delete button */
 @keyframes shake {
-    0%, 100% { transform: translateX(0) translateY(-2px); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px) translateY(-2px); }
-    20%, 40%, 60%, 80% { transform: translateX(2px) translateY(-2px); }
+    0%, 100% { transform: translateX(0) translateY(-3px) scale(1.05); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px) translateY(-3px) scale(1.05); }
+    20%, 40%, 60%, 80% { transform: translateX(3px) translateY(-3px) scale(1.05); }
 }
 
 /* Spin animation for loading */
@@ -499,15 +536,45 @@ main {
     100% { transform: rotate(360deg); }
 }
 
-/* Pulse animation for important buttons */
+/* Enhanced pulse animation for important buttons */
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
     70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
     100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
 }
 
+/* Green pulse for add button */
+@keyframes greenPulse {
+    0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+    70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Blue bounce for edit button */
+@keyframes blueBounce {
+    0%, 100% { transform: translateY(-3px) scale(1.05); }
+    50% { transform: translateY(-6px) scale(1.08) rotateZ(2deg); }
+}
+
+/* Red glow for delete button */
+@keyframes redGlow {
+    0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5), 0 8px 25px rgba(239, 68, 68, 0.6); }
+    100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8), 0 8px 25px rgba(239, 68, 68, 0.6); }
+}
+
+/* Floating animation */
+@keyframes float {
+    0%, 100% { transform: translateY(-3px) scale(1.05); }
+    50% { transform: translateY(-8px) scale(1.05); }
+}
+
 .add-btn:focus {
-    animation: pulse 2s infinite;
+    animation: greenPulse 2s infinite;
+}
+
+/* Special hover effects for inline buttons in OrderTable */
+.action-btn:hover {
+    animation: float 1s ease-in-out infinite;
 }
 
 /* ========================================================== */

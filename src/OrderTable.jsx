@@ -135,13 +135,13 @@ function OrderTable() {
                                     </td>
                                     <td style={tdStyle}>
                                         <button
-                                            style={{...actionBtn, background:'#38bdf8', color:'white'}}
+                                            className="action-btn edit-btn"
                                             onClick={()=>handleEditClick(order)}
-                                        >Edit</button>
+                                        >✏️ Edit</button>
                                         <button
-                                            style={{...actionBtn, background:'#ef4444', color:'white'}}
+                                            className="action-btn delete-btn"
                                             onClick={()=>handleDelete(order._id, order.serialNumber)}
-                                        >Delete</button>
+                                        >🗑️ Delete</button>
                                     </td>
                                 </tr>
                             ))}
