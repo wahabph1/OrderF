@@ -52,6 +52,27 @@
 .dash-content { display: grid; align-content: start; }
 .orders-wrap { background: transparent; }
 
+/* Owner chips */
+.owners-wrap { margin-top: 14px; display: grid; gap: 8px; }
+.owners-title { font-weight: 800; font-size: 14px; color: var(--muted); }
+.owners-list { display: grid; gap: 10px; }
+.owner-chip { border: 1px solid var(--panel-strong); border-radius: 10px; padding: 10px 12px; background: #fff; box-shadow: var(--shadow); }
+.owner-chip-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.owner-name { font-weight: 700; color: var(--text); }
+.owner-count { font-weight: 800; font-size: 12px; color: #0f172a; background: #eef2ff; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 999px; }
+.owner-bar { display: flex; height: 8px; border-radius: 999px; overflow: hidden; background: #f1f5f9; border: 1px solid var(--panel-strong); }
+.ob { height: 100%; }
+.ob.delivered { background: #22c55e; }
+.ob.pending { background: #f59e0b; }
+.ob.transit { background: #3b82f6; }
+.ob.cancelled { background: #ef4444; }
+.owner-legend { display: flex; gap: 8px; margin-top: 6px; font-size: 12px; color: var(--muted); }
+.owner-legend .ol-item { display: inline-flex; gap: 4px; align-items: center; }
+.owner-legend .ol-item.d { color: #166534; }
+.owner-legend .ol-item.p { color: #92400e; }
+.owner-legend .ol-item.t { color: #1e3a8a; }
+.owner-legend .ol-item.c { color: #991b1b; }
+
 /* Responsive: stack on smaller screens */
 @media (max-width: 1024px) {
   .dash-shell {
