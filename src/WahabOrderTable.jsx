@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import WahabOrderForm from './WahabOrderForm'; 
-import EditOrderModal from './EditOrderModal'; 
+import EditOrderModal from './EditOrderModal';
+import WahabReports from './WahabReports';
 import './styles/table.css';
 
 const API_URL = 'https://order-b.vercel.app/api/orders';
@@ -16,6 +17,7 @@ function WahabOrderTable() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [currentOrder, setCurrentOrder] = useState(null);
+    const [showReports, setShowReports] = useState(false);
 
     // Fetch only Wahab orders
     const fetchWahabOrders = useCallback(async () => {
@@ -86,6 +88,13 @@ function WahabOrderTable() {
                     value={searchTerm}
                     onChange={(e)=>setSearchTerm(e.target.value)}
                   />
+                  <button 
+                    className="btn" 
+                    onClick={() => setShowReports(true)}
+                    style={{ background: '#2563eb', color: 'white' }}
+                  >
+                    📊 Wahab Reports
+                  </button>
                   <button className="btn" onClick={handleRefresh}>Refresh Wahab</button>
                 </div>
               </div>
@@ -149,6 +158,33 @@ function WahabOrderTable() {
                     onClose={handleCloseModal}
                     onOrderUpdated={handleRefresh}
                 />
+            )}
+
+            {showReports && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '8px',
+                        maxWidth: '95vw',
+                        maxHeight: '90vh',
+                        overflow: 'auto',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
+                    }}>
+                        <WahabReports onClose={() => setShowReports(false)} />
+                    </div>
+                </div>
             )}
         </div>
     );
