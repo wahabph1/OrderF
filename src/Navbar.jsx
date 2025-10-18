@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 // Props: onNavClick (view change) aur currentView (active link highlight ke liye)
 function Navbar({ onNavClick, currentView }) { 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const projectName = "Order Tracking System ny wahab (OTS)";
+    const projectName = "TrackMate UAE";
 
     // Menu toggle function
     const toggleMenu = () => {
