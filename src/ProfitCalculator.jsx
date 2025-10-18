@@ -14,6 +14,8 @@ function ProfitCalculator() {
     const [result, setResult] = useState(null);
     const [showAddStore, setShowAddStore] = useState(false);
     const [newStore, setNewStore] = useState({ name: '', color: '#2563eb' });
+    const [showHistory, setShowHistory] = useState(false);
+    const [currentStoreHistory, setCurrentStoreHistory] = useState([]);
     
     // Load stores from localStorage or start with empty array
     const [stores, setStores] = useState(() => {
@@ -31,6 +33,33 @@ function ProfitCalculator() {
     useEffect(() => {
         localStorage.setItem('profitCalculatorStores', JSON.stringify(stores));
     }, [stores]);
+    
+    // Save calculation to store history
+    const saveCalculationToHistory = (storeId, calculationData) => {
+        const historyKey = `storeHistory_${storeId}`;
+        const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        
+        const newCalculation = {
+            ...calculationData,
+            timestamp: new Date().toISOString(),
+            id: Date.now().toString()
+        };
+        
+        const updatedHistory = [newCalculation, ...existingHistory].slice(0, 50); // Keep last 50 calculations
+        localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+    };
+    
+    // Load calculation history for a store
+    const loadStoreHistory = (storeId) => {
+        const historyKey = `storeHistory_${storeId}`;
+        return JSON.parse(localStorage.getItem(historyKey) || '[]');
+    };
+    
+    // Delete store history when store is deleted
+    const deleteStoreHistory = (storeId) => {
+        const historyKey = `storeHistory_${storeId}`;
+        localStorage.removeItem(historyKey);
+    };
 
     const handleStoreSelect = (store) => {
         setSelectedStore(store);
@@ -66,7 +95,7 @@ function ProfitCalculator() {
         // Profit calculation: (Real Price + Delivery Charges) × Number of Delivered Orders
         const totalProfit = (realPriceNum + deliveryChargesNum) * deliveredOrdersNum;
 
-        setResult({
+        const calculationResult = {
             itemName: formData.itemName,
             storeName: stores.find(s => s.id === selectedStore.id)?.name,
             realPrice: realPriceNum,
@@ -74,7 +103,12 @@ function ProfitCalculator() {
             deliveredOrders: deliveredOrdersNum,
             totalProfit: totalProfit,
             profitPerOrder: realPriceNum + deliveryChargesNum
-        });
+        };
+        
+        // Save to history
+        saveCalculationToHistory(selectedStore.id, calculationResult);
+        
+        setResult(calculationResult);
     };
 
     const resetCalculator = () => {
@@ -111,8 +145,9 @@ function ProfitCalculator() {
     
     const handleDeleteStore = (storeId) => {
         const storeName = stores.find(s => s.id === storeId)?.name;
-        if (window.confirm(`Are you sure you want to permanently delete "${storeName}" store?`)) {
+        if (window.confirm(`Are you sure you want to permanently delete "${storeName}" store and all its calculation history?`)) {
             setStores(prev => prev.filter(s => s.id !== storeId));
+            deleteStoreHistory(storeId);
         }
     };
 
@@ -240,6 +275,44 @@ function ProfitCalculator() {
                                     Calculate profit for {store.name.toLowerCase()}
                                 </p>
                             </button>
+                            
+                            {/* View History Button */}
+                            <div style={{ 
+                                position: 'absolute', 
+                                bottom: '8px', 
+                                left: '50%', 
+                                transform: 'translateX(-50%)' 
+                            }}>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const history = loadStoreHistory(store.id);
+                                        setCurrentStoreHistory(history);
+                                        setShowHistory(true);
+                                    }}
+                                    style={{
+                                        background: `${store.color}20`,
+                                        color: store.color,
+                                        border: `1px solid ${store.color}`,
+                                        borderRadius: '4px',
+                                        padding: '4px 8px',
+                                        fontSize: '10px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    title="View Calculation History"
+                                    onMouseEnter={(e) => {
+                                        e.target.style.background = store.color;
+                                        e.target.style.color = 'white';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.background = `${store.color}20`;
+                                        e.target.style.color = store.color;
+                                    }}
+                                >
+                                    📊 History ({loadStoreHistory(store.id).length})
+                                </button>
+                            </div>
                             
                             {/* Delete button for all stores */}
                             <button
@@ -838,6 +911,174 @@ function ProfitCalculator() {
                         >
                             Back to Stores
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Calculation History Modal */}
+            {showHistory && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.6)',
+                    zIndex: 1000,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        maxWidth: '800px',
+                        width: '100%',
+                        maxHeight: '90vh',
+                        overflow: 'hidden',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        {/* History Header */}
+                        <div style={{
+                            padding: '24px 24px 0',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderBottom: '1px solid #e5e7eb'
+                        }}>
+                            <h2 style={{
+                                margin: 0,
+                                fontSize: '24px',
+                                fontWeight: '600',
+                                color: '#1f2937'
+                            }}>
+                                📊 Calculation History
+                            </h2>
+                            <button
+                                onClick={() => setShowHistory(false)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '28px',
+                                    cursor: 'pointer',
+                                    color: '#9ca3af',
+                                    padding: '4px'
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        {/* History Content */}
+                        <div style={{
+                            flex: 1,
+                            overflow: 'auto',
+                            padding: '24px'
+                        }}>
+                            {currentStoreHistory.length === 0 ? (
+                                <div style={{
+                                    textAlign: 'center',
+                                    padding: '60px 20px',
+                                    color: '#6b7280'
+                                }}>
+                                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
+                                    <p style={{ margin: 0, fontSize: '18px', fontWeight: '500' }}>
+                                        No calculations yet
+                                    </p>
+                                    <p style={{ margin: '8px 0 0', fontSize: '14px' }}>
+                                        Start calculating profits to see history
+                                    </p>
+                                </div>
+                            ) : (
+                                <div style={{
+                                    display: 'grid',
+                                    gap: '16px'
+                                }}>
+                                    {currentStoreHistory.map(calc => (
+                                        <div
+                                            key={calc.id}
+                                            style={{
+                                                background: '#f8fafc',
+                                                border: '1px solid #e2e8f0',
+                                                borderRadius: '12px',
+                                                padding: '20px',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            <div style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'flex-start',
+                                                marginBottom: '12px'
+                                            }}>
+                                                <div>
+                                                    <h3 style={{
+                                                        margin: 0,
+                                                        fontSize: '16px',
+                                                        fontWeight: '600',
+                                                        color: '#1f2937'
+                                                    }}>
+                                                        {calc.itemName}
+                                                    </h3>
+                                                    <p style={{
+                                                        margin: '4px 0 0',
+                                                        fontSize: '12px',
+                                                        color: '#6b7280'
+                                                    }}>
+                                                        {new Date(calc.timestamp).toLocaleString()}
+                                                    </p>
+                                                </div>
+                                                <div style={{
+                                                    background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                                                    color: 'white',
+                                                    padding: '8px 12px',
+                                                    borderRadius: '8px',
+                                                    fontSize: '14px',
+                                                    fontWeight: '600'
+                                                }}>
+                                                    {calc.totalProfit.toFixed(2)} AED
+                                                </div>
+                                            </div>
+                                            
+                                            <div style={{
+                                                display: 'grid',
+                                                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                                                gap: '12px',
+                                                fontSize: '14px'
+                                            }}>
+                                                <div>
+                                                    <span style={{ color: '#6b7280' }}>Real Price:</span>
+                                                    <span style={{ fontWeight: '600', marginLeft: '4px' }}>
+                                                        {calc.realPrice.toFixed(2)} AED
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span style={{ color: '#6b7280' }}>Delivery:</span>
+                                                    <span style={{ fontWeight: '600', marginLeft: '4px' }}>
+                                                        {calc.deliveryCharges.toFixed(2)} AED
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span style={{ color: '#6b7280' }}>Orders:</span>
+                                                    <span style={{ fontWeight: '600', marginLeft: '4px' }}>
+                                                        {calc.deliveredOrders}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span style={{ color: '#6b7280' }}>Per Order:</span>
+                                                    <span style={{ fontWeight: '600', marginLeft: '4px' }}>
+                                                        {calc.profitPerOrder.toFixed(2)} AED
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
