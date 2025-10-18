@@ -81,6 +81,30 @@ function WahabOrderTable() {
     const toggleStatusEdit = (orderId) => {
         setEditingStatusId(editingStatusId === orderId ? null : orderId);
     };
+    
+    // Delete all Wahab orders
+    const handleDeleteAllOrders = async () => {
+        if (orders.length === 0) {
+            alert('No Wahab orders to delete');
+            return;
+        }
+        
+        if (window.confirm(`Are you sure you want to delete ALL ${orders.length} Wahab orders? This action cannot be undone!`)) {
+            try {
+                // Delete all orders from backend
+                const deletePromises = orders.map(order => 
+                    axios.delete(`${API_URL}/${order._id}`)
+                );
+                
+                await Promise.all(deletePromises);
+                setOrders([]);
+                alert('✅ All Wahab orders deleted successfully!');
+            } catch (err) {
+                alert('❌ Failed to delete some Wahab orders. Please try again.');
+                console.error(err);
+            }
+        }
+    };
 
     useEffect(() => {
         const delay = setTimeout(() => fetchWahabOrders(), DEBOUNCE_DELAY);
@@ -209,6 +233,27 @@ function WahabOrderTable() {
                     }}
                   >
                     Refresh Wahab
+                  </button>
+                  <button 
+                    className="btn" 
+                    onClick={handleDeleteAllOrders}
+                    style={{
+                      background: '#ef4444',
+                      color: 'white',
+                      border: '1px solid #dc2626',
+                      marginLeft: '8px',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}
+                    title={`Delete all ${orders.length} Wahab orders`}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#dc2626';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#ef4444';
+                    }}
+                  >
+                    🗑️ Delete All Wahab ({orders.length})
                   </button>
                 </div>
               </div>
