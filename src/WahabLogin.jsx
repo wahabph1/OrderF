@@ -200,20 +200,6 @@ function WahabLogin({ onLoginSuccess, onClose }) {
                         {loading ? 'Authenticating...' : 'Access Wahab Orders'}
                     </button>
                 </form>
-
-                {/* Hint for demo */}
-                <div style={{
-                    marginTop: '20px',
-                    padding: '12px',
-                    background: '#f3f4f6',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    color: '#6b7280',
-                    textAlign: 'center'
-                }}>
-                    <strong>Demo Credentials:</strong><br />
-                    Username: wahab | Password: wahab123
-                </div>
             </div>
         </div>
     );
