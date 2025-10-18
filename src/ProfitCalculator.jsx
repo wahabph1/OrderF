@@ -1,6 +1,6 @@
 // ProfitCalculator.jsx - Profit calculation system for different stores
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function ProfitCalculator() {
     const [selectedStore, setSelectedStore] = useState('');
@@ -15,14 +15,22 @@ function ProfitCalculator() {
     const [showAddStore, setShowAddStore] = useState(false);
     const [newStore, setNewStore] = useState({ name: '', color: '#2563eb' });
     
-    // Start with empty stores - users will add their own
-    const [stores, setStores] = useState([]);
+    // Load stores from localStorage or start with empty array
+    const [stores, setStores] = useState(() => {
+        const savedStores = localStorage.getItem('profitCalculatorStores');
+        return savedStores ? JSON.parse(savedStores) : [];
+    });
     
     const colorOptions = [
         '#e11d48', '#2563eb', '#16a34a', '#dc2626', '#7c3aed',
         '#ea580c', '#0891b2', '#c2410c', '#7c2d12', '#4338ca',
         '#be185d', '#059669', '#b91c1c', '#6366f1', '#9333ea'
     ];
+    
+    // Save stores to localStorage whenever stores change
+    useEffect(() => {
+        localStorage.setItem('profitCalculatorStores', JSON.stringify(stores));
+    }, [stores]);
 
     const handleStoreSelect = (store) => {
         setSelectedStore(store);
@@ -98,11 +106,12 @@ function ProfitCalculator() {
         setStores(prev => [...prev, store]);
         setNewStore({ name: '', color: '#2563eb' });
         setShowAddStore(false);
-        alert(`Store "${newStore.name}" added successfully!`);
+        alert(`✅ Store "${newStore.name}" added successfully and saved permanently!`);
     };
     
     const handleDeleteStore = (storeId) => {
-        if (window.confirm('Are you sure you want to delete this store?')) {
+        const storeName = stores.find(s => s.id === storeId)?.name;
+        if (window.confirm(`Are you sure you want to permanently delete "${storeName}" store?`)) {
             setStores(prev => prev.filter(s => s.id !== storeId));
         }
     };
