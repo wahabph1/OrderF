@@ -7,6 +7,7 @@ import './styles/table.css';
 const API_URL = 'https://order-b.vercel.app/api/orders';
 // Removed 'All' option and excluded Wahab from main dashboard
 const ownerOptions = ['All (Exc. Wahab)', 'Emirate Essentials', 'Ahsan', 'Habibi Tools']; 
+const statusOptions = ['Pending', 'In Transit', 'Delivered', 'Cancelled'];
 const DEBOUNCE_DELAY = 300;
 
 function OrderTable() {
@@ -17,6 +18,7 @@ function OrderTable() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [currentOrder, setCurrentOrder] = useState(null);
+    const [editingStatusId, setEditingStatusId] = useState(null);
 
     const fetchOrders = useCallback(async () => {
         setLoading(true); 
@@ -66,6 +68,28 @@ function OrderTable() {
     const handleEditClick = (order) => { setCurrentOrder(order); setIsEditing(true); };
     const handleCloseModal = () => { setIsEditing(false); setCurrentOrder(null); };
     const handleRefresh = useCallback(() => fetchOrders(), [fetchOrders]);
+    
+    // Handle inline status change
+    const handleStatusChange = async (orderId, newStatus) => {
+        try {
+            await axios.put(`${API_URL}/${orderId}`, { deliveryStatus: newStatus });
+            // Update local state
+            setOrders(prev => prev.map(order => 
+                order._id === orderId 
+                    ? { ...order, deliveryStatus: newStatus }
+                    : order
+            ));
+            setEditingStatusId(null);
+        } catch (err) {
+            alert('Failed to update status.');
+            console.error(err);
+        }
+    };
+    
+    // Toggle status dropdown
+    const toggleStatusEdit = (orderId) => {
+        setEditingStatusId(editingStatusId === orderId ? null : orderId);
+    };
 
     useEffect(() => {
         const delay = setTimeout(() => fetchOrders(), DEBOUNCE_DELAY);
@@ -131,9 +155,39 @@ function OrderTable() {
                           <td data-label="Date">{new Date(order.orderDate).toLocaleDateString()}</td>
                           <td data-label="Owner">{order.owner}</td>
                           <td data-label="Status">
-                            <span className={statusClass(order.deliveryStatus)}>
-                              {order.deliveryStatus}
-                            </span>
+                            {editingStatusId === order._id ? (
+                              <select
+                                value={order.deliveryStatus}
+                                onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                                onBlur={() => setEditingStatusId(null)}
+                                autoFocus
+                                style={{
+                                  padding: '4px 8px',
+                                  border: '2px solid #2563eb',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  background: 'white',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                {statusOptions.map(status => (
+                                  <option key={status} value={status}>{status}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span 
+                                className={statusClass(order.deliveryStatus)}
+                                onClick={() => toggleStatusEdit(order._id)}
+                                style={{ 
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s',
+                                  position: 'relative'
+                                }}
+                                title="Click to change status"
+                              >
+                                {order.deliveryStatus}
+                              </span>
+                            )}
                           </td>
                           <td data-label="Actions" className="actions-cell">
                             <button className="btn" onClick={()=>handleEditClick(order)}>✏️ Edit</button>
