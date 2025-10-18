@@ -1,6 +1,9 @@
 // ProfitCalculator.jsx - Profit calculation system for different stores
 
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const API_URL = 'https://order-b.vercel.app/api/profit';
 
 function ProfitCalculator() {
     const [selectedStore, setSelectedStore] = useState('');
@@ -18,11 +21,9 @@ function ProfitCalculator() {
     const [currentStoreHistory, setCurrentStoreHistory] = useState([]);
     const [currentStoreId, setCurrentStoreId] = useState('');
     
-    // Load stores from localStorage or start with empty array
-    const [stores, setStores] = useState(() => {
-        const savedStores = localStorage.getItem('profitCalculatorStores');
-        return savedStores ? JSON.parse(savedStores) : [];
-    });
+    // Load stores from database
+    const [stores, setStores] = useState([]);
+    const [loading, setLoading] = useState(true);
     
     const colorOptions = [
         '#e11d48', '#2563eb', '#16a34a', '#dc2626', '#7c3aed',
@@ -30,55 +31,69 @@ function ProfitCalculator() {
         '#be185d', '#059669', '#b91c1c', '#6366f1', '#9333ea'
     ];
     
-    // Save stores to localStorage whenever stores change
+    // Load stores from database on component mount
     useEffect(() => {
-        localStorage.setItem('profitCalculatorStores', JSON.stringify(stores));
-    }, [stores]);
+        fetchStores();
+    }, []);
     
-    // Save calculation to store history
-    const saveCalculationToHistory = (storeId, calculationData) => {
-        const historyKey = `storeHistory_${storeId}`;
-        const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
-        
-        const newCalculation = {
-            ...calculationData,
-            timestamp: new Date().toISOString(),
-            id: Date.now().toString()
-        };
-        
-        const updatedHistory = [newCalculation, ...existingHistory].slice(0, 50); // Keep last 50 calculations
-        localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+    // Fetch stores from database
+    const fetchStores = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`${API_URL}/stores`);
+            setStores(response.data);
+        } catch (error) {
+            console.error('Error fetching stores:', error);
+            alert('Failed to load stores. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
     
-    // Load calculation history for a store
-    const loadStoreHistory = (storeId) => {
-        const historyKey = `storeHistory_${storeId}`;
-        return JSON.parse(localStorage.getItem(historyKey) || '[]');
+    // Save calculation to database
+    const saveCalculationToHistory = async (storeId, calculationData) => {
+        try {
+            await axios.post(`${API_URL}/calculations`, calculationData);
+        } catch (error) {
+            console.error('Error saving calculation:', error);
+            alert('Failed to save calculation history.');
+        }
     };
     
-    // Delete store history when store is deleted
-    const deleteStoreHistory = (storeId) => {
-        const historyKey = `storeHistory_${storeId}`;
-        localStorage.removeItem(historyKey);
+    // Load calculation history for a store from database
+    const loadStoreHistory = async (storeId) => {
+        try {
+            const response = await axios.get(`${API_URL}/calculations/${storeId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error loading store history:', error);
+            return [];
+        }
     };
     
-    // Delete individual calculation from history
-    const deleteCalculation = (storeId, calculationId) => {
-        const historyKey = `storeHistory_${storeId}`;
-        const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
-        const updatedHistory = existingHistory.filter(calc => calc.id !== calculationId);
-        localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
-        
-        // Update current view
-        setCurrentStoreHistory(updatedHistory);
+    // Delete individual calculation from database
+    const deleteCalculation = async (storeId, calculationId) => {
+        try {
+            await axios.delete(`${API_URL}/calculations/${calculationId}`);
+            // Reload current store history
+            const updatedHistory = await loadStoreHistory(storeId);
+            setCurrentStoreHistory(updatedHistory);
+        } catch (error) {
+            console.error('Error deleting calculation:', error);
+            alert('Failed to delete calculation.');
+        }
     };
     
-    // Clear all history for a store
-    const clearStoreHistory = (storeId) => {
+    // Clear all history for a store from database
+    const clearStoreHistory = async (storeId) => {
         if (window.confirm('Are you sure you want to delete ALL calculation history for this store?')) {
-            const historyKey = `storeHistory_${storeId}`;
-            localStorage.removeItem(historyKey);
-            setCurrentStoreHistory([]);
+            try {
+                await axios.delete(`${API_URL}/calculations/store/${storeId}`);
+                setCurrentStoreHistory([]);
+            } catch (error) {
+                console.error('Error clearing store history:', error);
+                alert('Failed to clear store history.');
+            }
         }
     };
 
@@ -101,7 +116,7 @@ function ProfitCalculator() {
         }));
     };
 
-    const calculateProfit = () => {
+    const calculateProfit = async () => {
         const { realPrice, deliveryCharges, deliveredOrders } = formData;
         
         if (!realPrice || !deliveryCharges || !deliveredOrders) {
@@ -117,6 +132,7 @@ function ProfitCalculator() {
         const totalProfit = (realPriceNum + deliveryChargesNum) * deliveredOrdersNum;
 
         const calculationResult = {
+            storeId: selectedStore.id,
             itemName: formData.itemName,
             storeName: stores.find(s => s.id === selectedStore.id)?.name,
             realPrice: realPriceNum,
@@ -126,8 +142,8 @@ function ProfitCalculator() {
             profitPerOrder: realPriceNum + deliveryChargesNum
         };
         
-        // Save to history
-        saveCalculationToHistory(selectedStore.id, calculationResult);
+        // Save to database
+        await saveCalculationToHistory(selectedStore.id, calculationResult);
         
         setResult(calculationResult);
     };
@@ -145,7 +161,7 @@ function ProfitCalculator() {
         });
     };
     
-    const handleAddStore = () => {
+    const handleAddStore = async () => {
         if (!newStore.name.trim()) {
             alert('Please enter store name');
             return;
@@ -158,19 +174,52 @@ function ProfitCalculator() {
             color: newStore.color
         };
         
-        setStores(prev => [...prev, store]);
-        setNewStore({ name: '', color: '#2563eb' });
-        setShowAddStore(false);
-        alert(`✅ Store "${newStore.name}" added successfully and saved permanently!`);
-    };
-    
-    const handleDeleteStore = (storeId) => {
-        const storeName = stores.find(s => s.id === storeId)?.name;
-        if (window.confirm(`Are you sure you want to permanently delete "${storeName}" store and all its calculation history?`)) {
-            setStores(prev => prev.filter(s => s.id !== storeId));
-            deleteStoreHistory(storeId);
+        try {
+            const response = await axios.post(`${API_URL}/stores`, store);
+            setStores(prev => [...prev, response.data]);
+            setNewStore({ name: '', color: '#2563eb' });
+            setShowAddStore(false);
+            alert(`✅ Store "${newStore.name}" added successfully and saved to database!`);
+        } catch (error) {
+            console.error('Error adding store:', error);
+            if (error.response?.status === 400) {
+                alert(error.response.data.message || 'Store already exists.');
+            } else {
+                alert('Failed to add store. Please try again.');
+            }
         }
     };
+    
+    const handleDeleteStore = async (storeId) => {
+        const storeName = stores.find(s => s.id === storeId)?.name;
+        if (window.confirm(`Are you sure you want to permanently delete "${storeName}" store and all its calculation history?`)) {
+            try {
+                await axios.delete(`${API_URL}/stores/${storeId}`);
+                setStores(prev => prev.filter(s => s.id !== storeId));
+                alert('Store deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting store:', error);
+                alert('Failed to delete store. Please try again.');
+            }
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px', textAlign: 'center' }}>
+                <div style={{ 
+                    padding: '60px 20px',
+                    color: '#6b7280',
+                    fontSize: '18px'
+                }}>
+                    <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
+                    <p style={{ margin: 0, fontWeight: '500' }}>
+                        Loading Profit Calculator...
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
@@ -305,9 +354,9 @@ function ProfitCalculator() {
                                 transform: 'translateX(-50%)' 
                             }}>
                                 <button
-                                    onClick={(e) => {
+                                    onClick={async (e) => {
                                         e.stopPropagation();
-                                        const history = loadStoreHistory(store.id);
+                                        const history = await loadStoreHistory(store.id);
                                         setCurrentStoreHistory(history);
                                         setCurrentStoreId(store.id);
                                         setShowHistory(true);
@@ -332,7 +381,7 @@ function ProfitCalculator() {
                                         e.target.style.color = store.color;
                                     }}
                                 >
-                                    📊 History ({loadStoreHistory(store.id).length})
+                                    📊 History
                                 </button>
                             </div>
                             
@@ -1084,9 +1133,9 @@ function ProfitCalculator() {
                                                 
                                                 {/* Delete button for individual calculation */}
                                                 <button
-                                                    onClick={() => {
+                                                    onClick={async () => {
                                                         if (window.confirm(`Delete calculation for "${calc.itemName}"?`)) {
-                                                            deleteCalculation(currentStoreId, calc.id);
+                                                            await deleteCalculation(currentStoreId, calc._id);
                                                         }
                                                     }}
                                                     style={{
