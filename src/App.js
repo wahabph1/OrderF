@@ -1,7 +1,7 @@
 // Frontend/src/App.js
 
 import './App.css'; 
-import React, { useState } from 'react'; // <--- useState import kiya
+import React, { useState, useEffect } from 'react'; // <--- useState aur useEffect import kiya
 import OrderTable from '../src/OrderTable'; 
 import Footer from '../src/Footer'; 
 import Navbar from '../src/Navbar';
@@ -10,17 +10,51 @@ import OrderForm from '../src/OrderForm';
 import Reports from '../src/Reports';
 import Profile from '../src/Profile';
 import WahabOrderTable from '../src/WahabOrderTable'; // Wahab component import
+import WahabLogin from '../src/WahabLogin'; // Wahab authentication
 
 function App() {
     // Splash screen state
     const [showSplash, setShowSplash] = useState(true);
     
     // App open hone par sirf Add Order form dikhana hai
-    const [currentView, setCurrentView] = useState('addOrder'); 
+    const [currentView, setCurrentView] = useState('addOrder');
+    
+    // Wahab authentication states
+    const [showWahabLogin, setShowWahabLogin] = useState(false);
+    const [wahabAuthenticated, setWahabAuthenticated] = useState(false);
 
+    // Check authentication on component mount
+    useEffect(() => {
+        const isAuthenticated = sessionStorage.getItem('wahabAuthenticated') === 'true';
+        setWahabAuthenticated(isAuthenticated);
+    }, []);
+    
     // Function jo view change karega
     const handleNavClick = (view) => {
-        setCurrentView(view);
+        // Check if trying to access Wahab Orders
+        if (view === 'wahabOrders') {
+            const isAuthenticated = sessionStorage.getItem('wahabAuthenticated') === 'true';
+            if (isAuthenticated) {
+                setCurrentView(view);
+                setWahabAuthenticated(true);
+            } else {
+                setShowWahabLogin(true);
+            }
+        } else {
+            setCurrentView(view);
+        }
+    };
+    
+    // Handle successful Wahab login
+    const handleWahabLoginSuccess = () => {
+        setWahabAuthenticated(true);
+        setCurrentView('wahabOrders');
+        setShowWahabLogin(false);
+    };
+    
+    // Handle login modal close
+    const handleWahabLoginClose = () => {
+        setShowWahabLogin(false);
     };
     
     // Function to handle splash screen end
@@ -56,6 +90,14 @@ function App() {
             
             {/* 3. Footer */}
             <Footer />
+            
+            {/* Wahab Authentication Modal */}
+            {showWahabLogin && (
+                <WahabLogin 
+                    onLoginSuccess={handleWahabLoginSuccess}
+                    onClose={handleWahabLoginClose}
+                />
+            )}
             
         </div>
     );
