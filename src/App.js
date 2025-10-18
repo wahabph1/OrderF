@@ -6,14 +6,15 @@ import OrderTable from '../src/OrderTable';
 import Footer from '../src/Footer'; 
 import Navbar from '../src/Navbar';
 import SplashScreen from '../src/SplashScreen';
+import OrderForm from '../src/OrderForm';
+import Reports from '../src/Reports';
 
 function App() {
     // Splash screen state
     const [showSplash, setShowSplash] = useState(true);
     
-    // NEW STATE: Yeh decide karega ki kaunsa view dikhana hai
-    // Default 'dashboard' hoga. 'addOrder' form dikhane ke liye
-    const [currentView, setCurrentView] = useState('dashboard'); 
+    // App open hone par sirf Add Order form dikhana hai
+    const [currentView, setCurrentView] = useState('addOrder'); 
 
     // Function jo view change karega
     const handleNavClick = (view) => {
@@ -39,13 +40,11 @@ function App() {
             {/* 2. Main Content */}
             <main>
                 {currentView === 'dashboard' ? (
-                    // Dashboard view mein OrderTable dikhega (jismein form bhi hai)
-                    <OrderTable /> 
+                    <OrderTable />
+                ) : currentView === 'reports' ? (
+                    <Reports />
                 ) : (
-                    // Agar future mein aap form ko OrderTable se alag karna chahte hain, toh yahan dikha sakte hain
-                    // Filhal, hum OrderTable ko hi use karenge jahan form aur table dono hain.
-                    // Par agar aap form ko hide karna chahte hain toh agla step dekhein.
-                    <OrderTable /> 
+                    <OrderForm onOrderAdded={() => {}} />
                 )}
             </main>
             
