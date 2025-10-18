@@ -11,6 +11,7 @@ import Reports from '../src/Reports';
 import Profile from '../src/Profile';
 import WahabOrderTable from '../src/WahabOrderTable'; // Wahab component import
 import WahabLogin from '../src/WahabLogin'; // Wahab authentication
+import ProfitCalculator from '../src/ProfitCalculator'; // Profit Calculator
 
 function App() {
     // Splash screen state
@@ -84,6 +85,8 @@ function App() {
                     <Profile />
                 ) : currentView === 'wahabOrders' ? (
                     <WahabOrderTable />
+                ) : currentView === 'profitCalculator' ? (
+                    <ProfitCalculator />
                 ) : (
                     <OrderForm onOrderAdded={() => {}} />
                 )}

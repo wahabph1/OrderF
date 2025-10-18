@@ -96,6 +96,14 @@ function Navbar({ onNavClick, currentView }) {
 
           <button
             type="button"
+            className={currentView === 'profitCalculator' ? 'nav-link active' : 'nav-link'}
+            onClick={() => handleNavClick('profitCalculator')}
+          >
+            Profit Calculator
+          </button>
+
+          <button
+            type="button"
             className={currentView === 'profile' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('profile')}
           >
