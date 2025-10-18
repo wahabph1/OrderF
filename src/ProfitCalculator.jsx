@@ -16,6 +16,7 @@ function ProfitCalculator() {
     const [newStore, setNewStore] = useState({ name: '', color: '#2563eb' });
     const [showHistory, setShowHistory] = useState(false);
     const [currentStoreHistory, setCurrentStoreHistory] = useState([]);
+    const [currentStoreId, setCurrentStoreId] = useState('');
     
     // Load stores from localStorage or start with empty array
     const [stores, setStores] = useState(() => {
@@ -59,6 +60,26 @@ function ProfitCalculator() {
     const deleteStoreHistory = (storeId) => {
         const historyKey = `storeHistory_${storeId}`;
         localStorage.removeItem(historyKey);
+    };
+    
+    // Delete individual calculation from history
+    const deleteCalculation = (storeId, calculationId) => {
+        const historyKey = `storeHistory_${storeId}`;
+        const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+        const updatedHistory = existingHistory.filter(calc => calc.id !== calculationId);
+        localStorage.setItem(historyKey, JSON.stringify(updatedHistory));
+        
+        // Update current view
+        setCurrentStoreHistory(updatedHistory);
+    };
+    
+    // Clear all history for a store
+    const clearStoreHistory = (storeId) => {
+        if (window.confirm('Are you sure you want to delete ALL calculation history for this store?')) {
+            const historyKey = `storeHistory_${storeId}`;
+            localStorage.removeItem(historyKey);
+            setCurrentStoreHistory([]);
+        }
     };
 
     const handleStoreSelect = (store) => {
@@ -288,6 +309,7 @@ function ProfitCalculator() {
                                         e.stopPropagation();
                                         const history = loadStoreHistory(store.id);
                                         setCurrentStoreHistory(history);
+                                        setCurrentStoreId(store.id);
                                         setShowHistory(true);
                                     }}
                                     style={{
@@ -955,21 +977,48 @@ function ProfitCalculator() {
                                 fontWeight: '600',
                                 color: '#1f2937'
                             }}>
-                                📊 Calculation History
+                                📊 Calculation History ({currentStoreHistory.length})
                             </h2>
-                            <button
-                                onClick={() => setShowHistory(false)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    fontSize: '28px',
-                                    cursor: 'pointer',
-                                    color: '#9ca3af',
-                                    padding: '4px'
-                                }}
-                            >
-                                ×
-                            </button>
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                {currentStoreHistory.length > 0 && (
+                                    <button
+                                        onClick={() => clearStoreHistory(currentStoreId)}
+                                        style={{
+                                            background: '#ef4444',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            padding: '8px 12px',
+                                            fontSize: '12px',
+                                            cursor: 'pointer',
+                                            fontWeight: '500',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.background = '#dc2626';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.background = '#ef4444';
+                                        }}
+                                        title="Delete all calculations"
+                                    >
+                                        🗑️ Clear All
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => setShowHistory(false)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        fontSize: '28px',
+                                        cursor: 'pointer',
+                                        color: '#9ca3af',
+                                        padding: '4px'
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
                         </div>
                         
                         {/* History Content */}
@@ -1012,9 +1061,10 @@ function ProfitCalculator() {
                                                 display: 'flex',
                                                 justifyContent: 'space-between',
                                                 alignItems: 'flex-start',
-                                                marginBottom: '12px'
+                                                marginBottom: '12px',
+                                                position: 'relative'
                                             }}>
-                                                <div>
+                                                <div style={{ flex: 1, marginRight: '12px' }}>
                                                     <h3 style={{
                                                         margin: 0,
                                                         fontSize: '16px',
@@ -1031,13 +1081,55 @@ function ProfitCalculator() {
                                                         {new Date(calc.timestamp).toLocaleString()}
                                                     </p>
                                                 </div>
+                                                
+                                                {/* Delete button for individual calculation */}
+                                                <button
+                                                    onClick={() => {
+                                                        if (window.confirm(`Delete calculation for "${calc.itemName}"?`)) {
+                                                            deleteCalculation(currentStoreId, calc.id);
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '0',
+                                                        right: '0',
+                                                        background: '#ef4444',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '50%',
+                                                        width: '20px',
+                                                        height: '20px',
+                                                        cursor: 'pointer',
+                                                        fontSize: '10px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        transition: 'all 0.2s ease',
+                                                        opacity: 0.7
+                                                    }}
+                                                    title="Delete this calculation"
+                                                    onMouseEnter={(e) => {
+                                                        e.target.style.opacity = '1';
+                                                        e.target.style.background = '#dc2626';
+                                                        e.target.style.transform = 'scale(1.1)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.target.style.opacity = '0.7';
+                                                        e.target.style.background = '#ef4444';
+                                                        e.target.style.transform = 'scale(1)';
+                                                    }}
+                                                >
+                                                    ×
+                                                </button>
+                                                
                                                 <div style={{
                                                     background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
                                                     color: 'white',
                                                     padding: '8px 12px',
                                                     borderRadius: '8px',
                                                     fontSize: '14px',
-                                                    fontWeight: '600'
+                                                    fontWeight: '600',
+                                                    marginRight: '24px'
                                                 }}>
                                                     {calc.totalProfit.toFixed(2)} AED
                                                 </div>
