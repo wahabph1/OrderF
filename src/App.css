@@ -11,7 +11,7 @@
 }
 
 body {
-    background-color: #f5f6fa;
+    background-color: #ffffff;
     color: #1e293b;
 }
 
@@ -55,13 +55,39 @@ body {
     color: #fff;
     text-decoration: none;
     font-weight: 500;
-    transition: 0.3s;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-link:hover::before {
+    left: 100%;
 }
 
 .nav-link:hover,
 .nav-link.active {
     color: #38bdf8;
-    border-bottom: 2px solid #38bdf8;
+    background: rgba(56, 189, 248, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(56, 189, 248, 0.3);
+}
+
+.nav-link:active {
+    transform: translateY(0) scale(0.95);
+    transition: all 0.1s ease;
 }
 
 .menu-toggle {
@@ -71,6 +97,21 @@ body {
     font-size: 1.8rem;
     color: white;
     cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-toggle:hover {
+    background: rgba(56, 189, 248, 0.1);
+    transform: rotate(90deg) scale(1.1);
+}
+
+.menu-toggle:active {
+    transform: rotate(90deg) scale(0.9);
+    transition: all 0.1s ease;
 }
 
 .hamburger-icon, .close-icon {
@@ -165,15 +206,38 @@ main {
 .input-group select {
     padding: 0.6rem 0.8rem;
     border-radius: 8px;
-    border: 1px solid #cbd5e1;
+    border: 2px solid #cbd5e1;
     font-size: 0.95rem;
-    transition: border 0.3s;
+    background: #fff;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
 .input-group input:focus,
 .input-group select:focus {
     border-color: #38bdf8;
     outline: none;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+    transform: translateY(-1px);
+}
+
+.input-group input:hover,
+.input-group select:hover {
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group label {
+    transition: all 0.3s ease;
+}
+
+.input-group:focus-within label {
+    color: #38bdf8;
+    transform: translateY(-2px);
 }
 
 /* ========================================================== */
@@ -209,9 +273,14 @@ main {
     background: #f8fafc;
 }
 
+.order-table tbody tr {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .order-table tr:hover {
-    background: #e0f2fe;
-    transition: 0.2s;
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* ========================================================== */
@@ -224,6 +293,29 @@ main {
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: capitalize;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.status-tag:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.status-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.status-tag:hover::before {
+    left: 100%;
 }
 
 .status-delivered {
@@ -247,7 +339,7 @@ main {
 }
 
 /* ========================================================== */
-/* ACTION BUTTONS */
+/* ACTION BUTTONS WITH ANIMATIONS */
 /* ========================================================== */
 .action-btn {
     border: none;
@@ -258,47 +350,164 @@ main {
     font-weight: 600;
     cursor: pointer;
     margin-right: 0.5rem;
-    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn:active {
+    transform: translateY(0) scale(0.98);
+    transition: all 0.1s ease;
+}
+
+.action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+/* Ripple effect */
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+}
+
+.action-btn:active::before {
+    width: 300px;
+    height: 300px;
+    transition: width 0s, height 0s, top 0s, left 0s;
+}
+
+.action-btn > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Add Button */
 .add-btn {
-    background: #22c55e;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     color: white;
     width: 100%;
     margin-top: 1rem;
 }
 
 .add-btn:hover {
-    background: #16a34a;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
 }
 
+.add-btn:active {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+}
+
+/* Edit Button */
 .edit-btn {
-    background: #38bdf8;
+    background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     color: white;
 }
 
 .edit-btn:hover {
-    background: #0ea5e9;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
 }
 
+.edit-btn:active {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+/* Delete Button */
 .delete-btn {
-    background: #ef4444;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
+    animation: none;
 }
 
 .delete-btn:hover {
-    background: #dc2626;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    animation: shake 0.5s ease-in-out;
 }
 
+.delete-btn:active {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+}
+
+/* Save Button */
 .save-btn {
-    background: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     color: white;
     width: 100%;
     margin-top: 1rem;
 }
 
 .save-btn:hover {
-    background: #2563eb;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.save-btn:active {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+/* Loading Animation */
+.action-btn.loading {
+    pointer-events: none;
+    position: relative;
+}
+
+.action-btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Shake animation for delete button */
+@keyframes shake {
+    0%, 100% { transform: translateX(0) translateY(-2px); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px) translateY(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px) translateY(-2px); }
+}
+
+/* Spin animation for loading */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Pulse animation for important buttons */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+.add-btn:focus {
+    animation: pulse 2s infinite;
 }
 
 /* ========================================================== */
@@ -309,7 +518,26 @@ main {
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     margin-bottom: 2rem;
-    background: #f8fafc;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    animation: slideInFromTop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.form-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .form-message {
@@ -325,7 +553,7 @@ main {
     color: #b91c1c;
 }
 
-/* Modal */
+/* Modal with Animations */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -337,6 +565,7 @@ main {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content {
@@ -346,7 +575,9 @@ main {
     max-width: 500px;
     width: 90%;
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: slideInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(1);
 }
 
 .close-btn {
@@ -359,10 +590,46 @@ main {
     cursor: pointer;
     line-height: 1;
     color: #64748b;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
 }
 
 .close-btn:hover {
-    color: #1e293b;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    transform: rotate(90deg) scale(1.1);
+}
+
+.close-btn:active {
+    transform: rotate(90deg) scale(0.9);
+    transition: all 0.1s ease;
+}
+
+/* Modal Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInScale {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 /* ========================================================== */

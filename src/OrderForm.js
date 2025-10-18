@@ -68,9 +68,13 @@ function OrderForm({ onOrderAdded }) {
                     </select>
                 </div>
 
-                <button type="submit" className="action-btn add-btn" disabled={loading}>
-                    {loading ? 'Adding...' : 'Add Order'}
-                </button>
+                <button 
+                    type="submit" 
+                    className={`action-btn add-btn ${loading ? 'loading' : ''}`} 
+                    disabled={loading}
+                >
+                    {loading ? '' : 'Add Order'}
+                </button>
             </form>
             {message && <p className={`form-message ${message.startsWith('❌') ? 'error-message' : ''}`}>{message}</p>}
         </div>
