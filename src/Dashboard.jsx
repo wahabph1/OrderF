@@ -58,28 +58,28 @@ export default function Dashboard() {
         <div className="analysis-sticky">
           <h3 className="analysis-title">Analysis</h3>
           <div className="analysis-grid">
-            <div className="analysis-card">
-              <div className="ac-label">Total Orders</div>
+            <div className="analysis-card total">
+              <div className="ac-head"><span className="ac-icon total" aria-hidden></span><span className="ac-label">Total Orders</span></div>
               <div className="ac-value">{loading ? '…' : stats.total}</div>
             </div>
-            <div className="analysis-card">
-              <div className="ac-label">Delivered</div>
+            <div className="analysis-card delivered">
+              <div className="ac-head"><span className="ac-icon delivered" aria-hidden></span><span className="ac-label">Delivered</span></div>
               <div className="ac-value">{loading ? '…' : stats.delivered}</div>
             </div>
-            <div className="analysis-card">
-              <div className="ac-label">Pending</div>
+            <div className="analysis-card pending">
+              <div className="ac-head"><span className="ac-icon pending" aria-hidden></span><span className="ac-label">Pending</span></div>
               <div className="ac-value">{loading ? '…' : stats.pending}</div>
             </div>
-            <div className="analysis-card">
-              <div className="ac-label">In Transit</div>
+            <div className="analysis-card transit">
+              <div className="ac-head"><span className="ac-icon transit" aria-hidden></span><span className="ac-label">In Transit</span></div>
               <div className="ac-value">{loading ? '…' : stats.inTransit}</div>
             </div>
-            <div className="analysis-card">
-              <div className="ac-label">Cancelled</div>
+            <div className="analysis-card cancelled">
+              <div className="ac-head"><span className="ac-icon cancelled" aria-hidden></span><span className="ac-label">Cancelled</span></div>
               <div className="ac-value">{loading ? '…' : stats.cancelled}</div>
             </div>
             {error && (
-              <div className="analysis-card" style={{ borderColor: '#fecaca', background: '#fef2f2' }}>
+              <div className="analysis-card error" style={{ borderColor: '#fecaca', background: '#fef2f2' }}>
                 <div className="ac-label" style={{ color: '#b91c1c' }}>{error}</div>
               </div>
             )}
