@@ -20,8 +20,7 @@ function WahabLogin({ onLoginSuccess, onClose }) {
         // Simulate login delay for better UX
         setTimeout(() => {
             if (username === WAHAB_USERNAME && password === WAHAB_PASSWORD) {
-                // Store authentication in sessionStorage (temporary)
-                sessionStorage.setItem('wahabAuthenticated', 'true');
+                // Authentication successful - no persistent storage
                 onLoginSuccess();
             } else {
                 setError('Invalid username or password');

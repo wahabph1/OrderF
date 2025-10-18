@@ -22,21 +22,22 @@ function App() {
     // Wahab authentication states
     const [showWahabLogin, setShowWahabLogin] = useState(false);
     const [wahabAuthenticated, setWahabAuthenticated] = useState(false);
-
-    // Check authentication on component mount
+    
+    // No persistent authentication - always require login after refresh
+    // Reset to addOrder if trying to access wahabOrders without authentication
     useEffect(() => {
-        const isAuthenticated = sessionStorage.getItem('wahabAuthenticated') === 'true';
-        setWahabAuthenticated(isAuthenticated);
-    }, []);
+        if (currentView === 'wahabOrders' && !wahabAuthenticated) {
+            setCurrentView('addOrder');
+        }
+    }, [currentView, wahabAuthenticated]);
     
     // Function jo view change karega
     const handleNavClick = (view) => {
         // Check if trying to access Wahab Orders
         if (view === 'wahabOrders') {
-            const isAuthenticated = sessionStorage.getItem('wahabAuthenticated') === 'true';
-            if (isAuthenticated) {
+            // Always require authentication for Wahab Orders
+            if (wahabAuthenticated) {
                 setCurrentView(view);
-                setWahabAuthenticated(true);
             } else {
                 setShowWahabLogin(true);
             }
