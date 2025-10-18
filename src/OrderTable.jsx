@@ -113,27 +113,27 @@ function OrderTable() {
             {orders.length === 0 ? (
                 <p style={{textAlign:'center'}}>No orders found for the current selection.</p>
             ) : (
-                <div style={tableWrapper}>
-                    <table style={tableStyle}>
+                <div className="table-wrapper">
+                    <table className="order-table">
                         <thead>
                             <tr>
-                                <th style={thStyle}>Serial No.</th>
-                                <th style={thStyle}>Date</th>
-                                <th style={thStyle}>Owner</th>
-                                <th style={thStyle}>Status</th>
-                                <th style={thStyle}>Actions</th>
+                                <th>Serial No.</th>
+                                <th>Date</th>
+                                <th>Owner</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {orders.map(order=>(
-                                <tr key={order._id} style={{background:'#f8fafc'}}>
-                                    <td style={tdStyle}>{order.serialNumber}</td>
-                                    <td style={tdStyle}>{new Date(order.orderDate).toLocaleDateString()}</td>
-                                    <td style={tdStyle}>{order.owner}</td>
-                                    <td style={tdStyle}>
-                                        <span style={statusStyles[order.deliveryStatus] || {}}>{order.deliveryStatus}</span>
+                                <tr key={order._id}>
+                                    <td data-label="Serial No.">{order.serialNumber}</td>
+                                    <td data-label="Date">{new Date(order.orderDate).toLocaleDateString()}</td>
+                                    <td data-label="Owner">{order.owner}</td>
+                                    <td data-label="Status">
+                                        <span className="status-tag" style={statusStyles[order.deliveryStatus] || {}}>{order.deliveryStatus}</span>
                                     </td>
-                                    <td style={tdStyle}>
+                                    <td data-label="Actions" className="actions-cell">
                                         <button
                                             className="action-btn edit-btn"
                                             onClick={()=>handleEditClick(order)}
