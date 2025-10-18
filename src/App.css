@@ -152,6 +152,78 @@ body {
   box-shadow: 0 2px 6px rgba(37, 99, 235, 0.1);
 }
 
+/* Rotating conic ring animation like logo */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 8px;
+  background: conic-gradient(#0ea5e9, transparent 40%, #2563eb 70%, transparent 85%);
+  -webkit-mask: radial-gradient(circle at center, transparent 6px, #000 7px);
+  mask: radial-gradient(circle at center, transparent 6px, #000 7px);
+  animation: navButtonSpin 6s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Breathing border ring */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 8px;
+  border: 1px solid rgba(14,165,233,0.3);
+  animation: navButtonPulse 2.5s ease-in-out infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show animations on hover */
+.nav-link:hover::before,
+.nav-link:hover::after {
+  opacity: 0.6;
+}
+
+.nav-link.active::before,
+.nav-link.active::after {
+  opacity: 0.8;
+}
+
+/* Shine effect */
+.nav-link .nav-shine {
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 35%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 65%);
+  transform: translateX(-130%);
+  animation: navButtonShine 5s ease-in-out 1s infinite;
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-link:hover .nav-shine {
+  opacity: 1;
+}
+
+/* Animation keyframes */
+@keyframes navButtonSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes navButtonPulse {
+  0% { opacity: 0.3; transform: scale(0.98); }
+  50% { opacity: 0.6; transform: scale(1.02); }
+  100% { opacity: 0.4; transform: scale(1); }
+}
+
+@keyframes navButtonShine {
+  0% { transform: translateX(-130%); }
+  45% { transform: translateX(130%); }
+  100% { transform: translateX(130%); }
+}
+
 .nav-link:hover {
   color: #ffffff;
   background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);

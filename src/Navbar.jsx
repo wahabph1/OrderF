@@ -57,6 +57,7 @@ function Navbar({ onNavClick, currentView }) {
             className={currentView === 'dashboard' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('dashboard')}
           >
+            <span className="nav-shine" aria-hidden></span>
             Dashboard
           </button>
 
@@ -65,6 +66,7 @@ function Navbar({ onNavClick, currentView }) {
             className={currentView === 'reports' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('reports')}
           >
+            <span className="nav-shine" aria-hidden></span>
             Reports
           </button>
 
@@ -73,6 +75,7 @@ function Navbar({ onNavClick, currentView }) {
             className={currentView === 'wahabOrders' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('wahabOrders')}
           >
+            <span className="nav-shine" aria-hidden></span>
             Wahab Orders
           </button>
 
@@ -81,6 +84,7 @@ function Navbar({ onNavClick, currentView }) {
             className={currentView === 'qatarOrderDetails' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('qatarOrderDetails')}
           >
+            <span className="nav-shine" aria-hidden></span>
             Qatar Order Details
           </button>
 
@@ -89,6 +93,7 @@ function Navbar({ onNavClick, currentView }) {
             className={currentView === 'profitCalculator' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('profitCalculator')}
           >
+            <span className="nav-shine" aria-hidden></span>
             Profit Calculator
           </button>
 
@@ -97,6 +102,7 @@ function Navbar({ onNavClick, currentView }) {
             className={currentView === 'profile' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('profile')}
           >
+            <span className="nav-shine" aria-hidden></span>
             Profile
           </button>
         </nav>
