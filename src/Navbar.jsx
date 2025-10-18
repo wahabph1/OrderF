@@ -86,16 +86,6 @@ function Navbar({ onNavClick, currentView }) {
 
           <button
             type="button"
-            className={
-              currentView === 'addOrder' ? 'nav-link primary active' : 'nav-link primary'
-            }
-            onClick={() => handleNavClick('addOrder')}
-          >
-            Add Order
-          </button>
-
-          <button
-            type="button"
             className={currentView === 'profitCalculator' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('profitCalculator')}
           >
