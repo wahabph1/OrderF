@@ -17,18 +17,18 @@ function App() {
     // Splash screen state
     const [showSplash, setShowSplash] = useState(true);
     
-    // App open hone par sirf Add Order form dikhana hai
-    const [currentView, setCurrentView] = useState('addOrder');
+    // App open hone par dashboard dikhana hai
+    const [currentView, setCurrentView] = useState('dashboard');
     
     // Wahab authentication states
     const [showWahabLogin, setShowWahabLogin] = useState(false);
     const [wahabAuthenticated, setWahabAuthenticated] = useState(false);
     
     // No persistent authentication - always require login after refresh
-    // Reset to addOrder if trying to access wahabOrders without authentication
+    // Reset to dashboard if trying to access wahabOrders without authentication
     useEffect(() => {
         if (currentView === 'wahabOrders' && !wahabAuthenticated) {
-            setCurrentView('addOrder');
+            setCurrentView('dashboard');
         }
     }, [currentView, wahabAuthenticated]);
     
