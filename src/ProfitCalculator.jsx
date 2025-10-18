@@ -15,14 +15,8 @@ function ProfitCalculator() {
     const [showAddStore, setShowAddStore] = useState(false);
     const [newStore, setNewStore] = useState({ name: '', color: '#2563eb' });
     
-    // Initial stores - can be extended dynamically
-    const [stores, setStores] = useState([
-        { id: 'metro', name: 'Metro Hardware Store', color: '#e11d48' },
-        { id: 'emirate', name: 'Emirate Essentials', color: '#2563eb' },
-        { id: 'habibi', name: 'Habibi Tools', color: '#16a34a' },
-        { id: 'ahsan', name: 'Ahsan Store', color: '#dc2626' },
-        { id: 'wahab', name: 'Wahab Business', color: '#7c3aed' }
-    ]);
+    // Start with empty stores - users will add their own
+    const [stores, setStores] = useState([]);
     
     const colorOptions = [
         '#e11d48', '#2563eb', '#16a34a', '#dc2626', '#7c3aed',
@@ -108,13 +102,6 @@ function ProfitCalculator() {
     };
     
     const handleDeleteStore = (storeId) => {
-        // Don't allow deleting original stores
-        const originalStores = ['metro', 'emirate', 'habibi', 'ahsan', 'wahab'];
-        if (originalStores.includes(storeId)) {
-            alert('Cannot delete original stores');
-            return;
-        }
-        
         if (window.confirm('Are you sure you want to delete this store?')) {
             setStores(prev => prev.filter(s => s.id !== storeId));
         }
@@ -190,9 +177,7 @@ function ProfitCalculator() {
                         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                         gap: '20px'
                     }}>
-                        {stores.map(store => {
-                            const isOriginalStore = ['metro', 'emirate', 'habibi', 'ahsan', 'wahab'].includes(store.id);
-                            return (
+                        {stores.map(store => (
                             <div key={store.id} style={{ position: 'relative' }}>
                                 <button
                                     onClick={() => handleStoreSelect(store)}
@@ -247,46 +232,62 @@ function ProfitCalculator() {
                                 </p>
                             </button>
                             
-                            {/* Delete button for custom stores */}
-                            {!isOriginalStore && (
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteStore(store.id);
-                                    }}
-                                    style={{
-                                        position: 'absolute',
-                                        top: '8px',
-                                        right: '8px',
-                                        background: '#ef4444',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '50%',
-                                        width: '24px',
-                                        height: '24px',
-                                        cursor: 'pointer',
-                                        fontSize: '12px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        transition: 'all 0.2s ease'
-                                    }}
-                                    title="Delete Store"
-                                    onMouseEnter={(e) => {
-                                        e.target.style.background = '#dc2626';
-                                        e.target.style.transform = 'scale(1.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.background = '#ef4444';
-                                        e.target.style.transform = 'scale(1)';
-                                    }}
-                                >
-                                    ×
-                                </button>
-                            )}
+                            {/* Delete button for all stores */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteStore(store.id);
+                                }}
+                                style={{
+                                    position: 'absolute',
+                                    top: '8px',
+                                    right: '8px',
+                                    background: '#ef4444',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '50%',
+                                    width: '24px',
+                                    height: '24px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                title="Delete Store"
+                                onMouseEnter={(e) => {
+                                    e.target.style.background = '#dc2626';
+                                    e.target.style.transform = 'scale(1.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.background = '#ef4444';
+                                    e.target.style.transform = 'scale(1)';
+                                }}
+                            >
+                                ×
+                            </button>
                             </div>
-                            );
-                        })}
+                        ))}
+                        
+                        {/* Empty state message */}
+                        {stores.length === 0 && (
+                            <div style={{
+                                gridColumn: '1 / -1',
+                                textAlign: 'center',
+                                padding: '60px 20px',
+                                color: '#6b7280',
+                                fontSize: '18px'
+                            }}>
+                                <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</div>
+                                <p style={{ margin: 0, marginBottom: '8px', fontWeight: '500' }}>
+                                    No stores added yet
+                                </p>
+                                <p style={{ margin: 0, fontSize: '14px' }}>
+                                    Click "Add Store" to create your first store
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
