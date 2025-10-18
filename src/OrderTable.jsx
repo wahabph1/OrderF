@@ -147,6 +147,13 @@ function OrderTable() {
             ) : (
                 <div style={tableWrapper}>
                     <table style={tableStyle}>
+                        <colgroup>
+                            <col style={{ width: isMobile ? '18%' : 'auto' }} />
+                            <col style={{ width: isMobile ? '18%' : 'auto' }} />
+                            <col style={{ width: isMobile ? '18%' : 'auto' }} />
+                            <col style={{ width: isMobile ? '18%' : 'auto' }} />
+                            <col style={{ width: isMobile ? '28%' : 'auto' }} />
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th style={thStyle}>Serial No.</th>
@@ -169,7 +176,7 @@ function OrderTable() {
                                             fontSize: isMobile ? '10px' : '0.85rem'
                                         }}>{order.deliveryStatus}</span>
                                     </td>
-                                    <td style={tdStyle} data-label="Actions" className="actions-cell">
+                                    <td style={{ ...tdStyle, overflow: isMobile ? 'visible' : tdStyle.overflow }} data-label="Actions" className="actions-cell">
                                         <button
                                             className="action-btn edit-btn"
                                             style={{
@@ -179,7 +186,7 @@ function OrderTable() {
                                                 marginRight: isMobile ? '2px' : '0.3rem'
                                             }}
                                             onClick={()=>handleEditClick(order)}
-                                        >✏️ Edit</button>
+>{isMobile ? '✏️' : '✏️ Edit'}</button>
                                         <button
                                             className="action-btn delete-btn"
                                             style={{
@@ -189,7 +196,7 @@ function OrderTable() {
                                                 marginRight: isMobile ? '2px' : '0.3rem'
                                             }}
                                             onClick={()=>handleDelete(order._id, order.serialNumber)}
-                                        >🗑️ Delete</button>
+>{isMobile ? '🗑️' : '🗑️ Delete'}</button>
                                     </td>
                                 </tr>
                             ))}
