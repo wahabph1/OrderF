@@ -52,16 +52,12 @@ body {
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
     letter-spacing: 1px;
-    animation: glow 2s ease-in-out infinite alternate, 
-               gradientShift 3s ease-in-out infinite,
-               pulse 1.5s ease-in-out infinite;
     cursor: pointer;
     transition: transform 0.3s ease;
 }
 
 .brand-name:hover {
     transform: scale(1.05) rotate(1deg);
-    animation-duration: 1s, 1.5s, 0.8s;
 }
 
 .nav-links {
@@ -771,6 +767,47 @@ footer {
 /* ========================================================== */
 /* MOBILE RESPONSIVENESS */
 /* ========================================================== */
+/* Mobile-first constraints to keep one-row, no wrap, no scrollbar */
+@media (max-width: 480px) {
+    .table-wrapper {
+        overflow-x: hidden; /* No horizontal scroll */
+    }
+    
+    .order-table {
+        table-layout: fixed;         /* columns get equal width, prevent overflow surprises */
+        width: 100%;
+        min-width: auto;             /* Remove min-width */
+    }
+    
+    .order-table th, 
+    .order-table td {
+        padding: 6px 4px;            /* tighter spacing */
+        font-size: 11px;             /* smaller font */
+        white-space: nowrap;         /* no line break */
+        overflow: hidden;            /* hide extra text */
+        text-overflow: ellipsis;     /* show ... if too long */
+        max-width: 1px;              /* enables shrink in fixed layout */
+    }
+    
+    /* Optional: narrow specific columns more */
+    .order-table th:nth-child(1), .order-table td:nth-child(1) { width: 20%; }
+    .order-table th:nth-child(2), .order-table td:nth-child(2) { width: 20%; }
+    .order-table th:nth-child(3), .order-table td:nth-child(3) { width: 20%; }
+    .order-table th:nth-child(4), .order-table td:nth-child(4) { width: 20%; }
+    .order-table th:nth-child(5), .order-table td:nth-child(5) { width: 20%; }
+    
+    .action-btn {
+        padding: 0.2rem 0.4rem;
+        font-size: 10px;
+        margin-right: 2px;
+    }
+    
+    .status-tag {
+        padding: 0.2rem 0.4rem;
+        font-size: 10px;
+    }
+}
+
 @media (max-width: 768px) {
     .filter-search-container {
         flex-direction: column;

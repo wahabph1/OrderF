@@ -15,6 +15,7 @@ function OrderTable() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [currentOrder, setCurrentOrder] = useState(null);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 480);
 
     const fetchOrders = useCallback(async () => {
         setLoading(true); 
@@ -57,16 +58,47 @@ function OrderTable() {
         return () => clearTimeout(delay);
     }, [filterOwner, searchTerm, fetchOrders]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 480);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // ==== INLINE STYLES ====
     const containerStyle = { padding:'1rem', maxWidth:'1200px', margin:'auto' };
     const headingStyle = { textAlign:'center', margin:'1rem 0', fontSize:'1.8rem', fontWeight:'600' };
     const filterContainer = { display:'flex', flexWrap:'wrap', gap:'1rem', marginBottom:'1rem' };
     const inputGroup = { display:'flex', flexDirection:'column', flex:1, minWidth:'150px' };
     const inputStyle = { padding:'0.5rem', borderRadius:'6px', border:'1px solid #cbd5e1', fontSize:'0.95rem' };
-    const tableWrapper = { overflowX:'auto', borderRadius:'10px', marginTop:'1rem' };
-    const tableStyle = { width:'100%', borderCollapse:'collapse', minWidth:'500px', background:'#fff' };
-    const thStyle = { padding:'0.8rem', background:'#1e293b', color:'white', textTransform:'uppercase', fontSize:'0.85rem', textAlign:'left' };
-    const tdStyle = { padding:'0.7rem', fontSize:'0.85rem', textAlign:'left' };
+    const tableWrapper = { overflowX:'hidden', borderRadius:'10px', marginTop:'1rem' };
+    const tableStyle = { 
+        width:'100%', 
+        borderCollapse:'collapse', 
+        minWidth: isMobile ? 'auto' : '500px',
+        tableLayout: isMobile ? 'fixed' : 'auto',
+        background:'#fff' 
+    };
+    const thStyle = { 
+        padding: isMobile ? '6px 4px' : '0.8rem', 
+        background:'#1e293b', 
+        color:'white', 
+        textTransform:'uppercase', 
+        fontSize: isMobile ? '11px' : '0.85rem', 
+        textAlign:'left',
+        whiteSpace: isMobile ? 'nowrap' : 'normal',
+        overflow: isMobile ? 'hidden' : 'visible',
+        textOverflow: isMobile ? 'ellipsis' : 'clip'
+    };
+    const tdStyle = { 
+        padding: isMobile ? '6px 4px' : '0.7rem', 
+        fontSize: isMobile ? '11px' : '0.85rem', 
+        textAlign:'left',
+        whiteSpace: isMobile ? 'nowrap' : 'normal',
+        overflow: isMobile ? 'hidden' : 'visible',
+        textOverflow: isMobile ? 'ellipsis' : 'clip'
+    };
     const actionBtn = { padding:'0.3rem 0.6rem', fontSize:'0.8rem', marginRight:'0.3rem', border:'none', borderRadius:'6px', cursor:'pointer' };
     const statusStyles = {
         Delivered: { background:'#dcfce7', color:'#166534', padding:'0.3rem 0.6rem', borderRadius:'6px', fontWeight:'600' },
@@ -113,33 +145,49 @@ function OrderTable() {
             {orders.length === 0 ? (
                 <p style={{textAlign:'center'}}>No orders found for the current selection.</p>
             ) : (
-                <div className="table-wrapper">
-                    <table className="order-table">
+                <div style={tableWrapper}>
+                    <table style={tableStyle}>
                         <thead>
                             <tr>
-                                <th>Serial No.</th>
-                                <th>Date</th>
-                                <th>Owner</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th style={thStyle}>Serial No.</th>
+                                <th style={thStyle}>Date</th>
+                                <th style={thStyle}>Owner</th>
+                                <th style={thStyle}>Status</th>
+                                <th style={thStyle}>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {orders.map(order=>(
                                 <tr key={order._id}>
-                                    <td data-label="Serial No.">{order.serialNumber}</td>
-                                    <td data-label="Date">{new Date(order.orderDate).toLocaleDateString()}</td>
-                                    <td data-label="Owner">{order.owner}</td>
-                                    <td data-label="Status">
-                                        <span className="status-tag" style={statusStyles[order.deliveryStatus] || {}}>{order.deliveryStatus}</span>
+                                    <td style={tdStyle} data-label="Serial No.">{order.serialNumber}</td>
+                                    <td style={tdStyle} data-label="Date">{new Date(order.orderDate).toLocaleDateString()}</td>
+                                    <td style={tdStyle} data-label="Owner">{order.owner}</td>
+                                    <td style={tdStyle} data-label="Status">
+                                        <span className="status-tag" style={{
+                                            ...statusStyles[order.deliveryStatus] || {},
+                                            padding: isMobile ? '0.2rem 0.4rem' : '0.3rem 0.6rem',
+                                            fontSize: isMobile ? '10px' : '0.85rem'
+                                        }}>{order.deliveryStatus}</span>
                                     </td>
-                                    <td data-label="Actions" className="actions-cell">
+                                    <td style={tdStyle} data-label="Actions" className="actions-cell">
                                         <button
                                             className="action-btn edit-btn"
+                                            style={{
+                                                ...actionBtn,
+                                                padding: isMobile ? '0.2rem 0.4rem' : '0.3rem 0.6rem',
+                                                fontSize: isMobile ? '10px' : '0.8rem',
+                                                marginRight: isMobile ? '2px' : '0.3rem'
+                                            }}
                                             onClick={()=>handleEditClick(order)}
                                         >✏️ Edit</button>
                                         <button
                                             className="action-btn delete-btn"
+                                            style={{
+                                                ...actionBtn,
+                                                padding: isMobile ? '0.2rem 0.4rem' : '0.3rem 0.6rem',
+                                                fontSize: isMobile ? '10px' : '0.8rem',
+                                                marginRight: isMobile ? '2px' : '0.3rem'
+                                            }}
                                             onClick={()=>handleDelete(order._id, order.serialNumber)}
                                         >🗑️ Delete</button>
                                     </td>
