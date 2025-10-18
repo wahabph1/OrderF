@@ -4,9 +4,13 @@ import './App.css';
 import React, { useState } from 'react'; // <--- useState import kiya
 import OrderTable from '../src/OrderTable'; 
 import Footer from '../src/Footer'; 
-import Navbar from '../src/Navbar'; 
+import Navbar from '../src/Navbar';
+import SplashScreen from '../src/SplashScreen';
 
 function App() {
+    // Splash screen state
+    const [showSplash, setShowSplash] = useState(true);
+    
     // NEW STATE: Yeh decide karega ki kaunsa view dikhana hai
     // Default 'dashboard' hoga. 'addOrder' form dikhane ke liye
     const [currentView, setCurrentView] = useState('dashboard'); 
@@ -15,6 +19,16 @@ function App() {
     const handleNavClick = (view) => {
         setCurrentView(view);
     };
+    
+    // Function to handle splash screen end
+    const handleSplashEnd = () => {
+        setShowSplash(false);
+    };
+
+    // Show splash screen first
+    if (showSplash) {
+        return <SplashScreen onAnimationEnd={handleSplashEnd} />;
+    }
 
     return (
         <div className="App">

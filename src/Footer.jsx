@@ -10,7 +10,7 @@ function Footer() {
     return (
         <footer style={footerStyle}>
             <div style={containerStyle}>
-                <p style={titleStyle}>Order Tracking System (OTS)</p>
+                <p style={titleStyle}>TrackMate UAE</p>
 
                 <p style={detailStyle}>Developed by: <strong>{developerName}</strong></p>
 
@@ -40,11 +40,13 @@ function Footer() {
 
 // Inline CSS
 const footerStyle = {
-    background: 'linear-gradient(135deg, #1e293b, #111827)',
+    background: 'linear-gradient(135deg, #0f0c29 0%, #24243e 50%, #302b63 100%)',
     color: '#f8f9fa',
     padding: '30px 20px',
     marginTop: '50px',
-    borderTop: '5px solid #2563eb',
+    borderTop: '3px solid transparent',
+    borderImage: 'linear-gradient(90deg, #ffd700, #ff6b35) 1',
+    boxShadow: '0 -8px 25px rgba(15, 12, 41, 0.6), 0 -2px 10px rgba(255, 215, 0, 0.1)',
 };
 
 const containerStyle = {
@@ -57,7 +59,11 @@ const titleStyle = {
     fontSize: '1.4em',
     fontWeight: '700',
     marginBottom: '12px',
-    color: '#38bdf8',
+    background: 'linear-gradient(45deg, #ffd700, #ff6b35, #f7931e)',
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    textShadow: '0 0 20px rgba(255, 215, 0, 0.5)',
 };
 
 const detailStyle = {
@@ -66,10 +72,12 @@ const detailStyle = {
 };
 
 const linkStyle = {
-    color: '#60a5fa',
+    color: '#ffd700',
     textDecoration: 'none',
-    transition: 'color 0.3s',
+    transition: 'all 0.3s ease',
     fontWeight: '500',
+    position: 'relative',
+    textShadow: '0 0 10px rgba(255, 215, 0, 0.3)',
 };
 
 const socialContainer = {
@@ -84,11 +92,16 @@ const socialLink = {
     display: 'flex',
     alignItems: 'center',
     gap: '5px',
-    color: '#60a5fa',
+    color: '#ffd700',
     textDecoration: 'none',
     fontSize: '0.9em',
     fontWeight: '500',
-    transition: 'color 0.3s',
+    transition: 'all 0.3s ease',
+    padding: '8px 12px',
+    borderRadius: '20px',
+    background: 'rgba(255, 215, 0, 0.1)',
+    border: '1px solid rgba(255, 215, 0, 0.2)',
+    textShadow: '0 0 10px rgba(255, 215, 0, 0.3)',
 };
 
 const socialText = {
