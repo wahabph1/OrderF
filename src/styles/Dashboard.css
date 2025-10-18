@@ -18,6 +18,7 @@
   padding: 16px;
   min-height: calc(100vh - 80px);
   background: var(--bg);
+  overflow-x: hidden; /* prevent page-wide horizontal scroll */
 }
 
 /* Light theme modifier */
@@ -103,4 +104,22 @@
     padding: 12px;
   }
   .dash-sidebar { position: static; }
+}
+
+/* Mobile tweaks: cap analysis height and compact cards */
+@media (max-width: 768px) {
+  .dash-sidebar {
+    max-height: calc(100vh - 64px - 12px); /* below sticky navbar/menu */
+    overflow: auto;
+    padding: 10px;
+  }
+  .analysis-grid { grid-template-columns: 1fr 1fr; }
+  .analysis-card { padding: 10px 12px; }
+  .ac-value { font-size: 18px; }
+  .owners-wrap { margin-top: 10px; }
+  .owners-list {
+    max-height: 220px; /* limit owner rows length */
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
