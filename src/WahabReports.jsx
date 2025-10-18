@@ -125,7 +125,7 @@ function WahabReports({ onClose }) {
     return (
         <div className="reports-container">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 className="reports-title">🏷️ Wahab Orders Reports & Analytics</h2>
+                <h2 className="reports-title">Wahab Orders Reports & Analytics</h2>
                 <button 
                     className="btn" 
                     onClick={onClose}
@@ -174,24 +174,20 @@ function WahabReports({ onClose }) {
                 gap: '20px'
             }}>
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>📦</div>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{counts.total}</div>
-                    <div style={{ fontSize: '12px', opacity: 0.8 }}>Total Orders</div>
+                    <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px', opacity: 0.9 }}>TOTAL ORDERS</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold' }}>{counts.total}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>✅</div>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#22c55e' }}>{counts.delivered}</div>
-                    <div style={{ fontSize: '12px', opacity: 0.8 }}>Delivered</div>
+                    <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px', opacity: 0.9 }}>DELIVERED</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#22c55e' }}>{counts.delivered}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>💰</div>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#fbbf24' }}>{(counts.delivered * 500).toLocaleString()}</div>
-                    <div style={{ fontSize: '12px', opacity: 0.8 }}>PKR Earned</div>
+                    <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px', opacity: 0.9 }}>PKR EARNED</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#fbbf24' }}>{(counts.delivered * 500).toLocaleString()}</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>📊</div>
-                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#60a5fa' }}>{counts.total > 0 ? Math.round((counts.delivered / counts.total) * 100) : 0}%</div>
-                    <div style={{ fontSize: '12px', opacity: 0.8 }}>Success Rate</div>
+                    <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px', opacity: 0.9 }}>SUCCESS RATE</div>
+                    <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#60a5fa' }}>{counts.total > 0 ? Math.round((counts.delivered / counts.total) * 100) : 0}%</div>
                 </div>
             </div>
 
@@ -220,29 +216,23 @@ function WahabReports({ onClose }) {
                     }} />
                     <div style={{ position: 'relative', zIndex: 1 }}>
                         <div style={{ 
-                            fontSize: '48px', 
-                            marginBottom: '8px',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            fontSize: '16px', 
+                            fontWeight: '600',
+                            marginBottom: '12px',
+                            letterSpacing: '0.5px'
                         }}>
-                            💰
+                            WAHAB EARNINGS
                         </div>
                         <div style={{ 
-                            fontSize: '14px', 
-                            opacity: 0.9,
-                            marginBottom: '4px'
-                        }}>
-                            Wahab Earnings
-                        </div>
-                        <div style={{ 
-                            fontSize: '32px', 
+                            fontSize: '36px', 
                             fontWeight: 'bold',
-                            marginBottom: '4px',
+                            marginBottom: '8px',
                             textShadow: '0 2px 4px rgba(0,0,0,0.2)'
                         }}>
                             {(counts.delivered * 500).toLocaleString()} PKR
                         </div>
                         <div style={{ 
-                            fontSize: '12px', 
+                            fontSize: '14px', 
                             opacity: 0.8
                         }}>
                             {counts.delivered} Delivered Orders × 500 PKR
@@ -279,7 +269,7 @@ function WahabReports({ onClose }) {
                 <StatCard label="Delivered" value={counts.delivered} color={colors.delivered} />
                 <StatCard label="Cancelled" value={counts.cancelled} color={colors.cancelled} />
                 <div className="report-card" style={{ borderTopColor: '#22c55e', background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)' }}>
-                    <div className="report-card-label">💰 Total Earnings</div>
+                    <div className="report-card-label">Total Earnings</div>
                     <div className="report-card-value" style={{ color: '#22c55e', fontSize: '18px', fontWeight: 'bold' }}>
                         {(counts.delivered * 500).toLocaleString()} PKR
                     </div>
@@ -314,7 +304,7 @@ function WahabReports({ onClose }) {
                     color: '#666',
                     fontSize: '18px' 
                 }}>
-                    📊 No Wahab orders found. Add some orders to see analytics!
+                    No Wahab orders found. Add some orders to see analytics.
                 </div>
             )}
         </div>

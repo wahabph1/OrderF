@@ -81,7 +81,7 @@ function WahabOrderTable() {
               }}>
                 <div className="toolbar-left">
                   <span className="kpi">
-                    <span className="kpi-label">🏷️ Wahab Orders</span>
+                    <span className="kpi-label">Wahab Orders</span>
                     <span className="kpi-value">{orders.length}</span>
                   </span>
                 </div>
@@ -110,7 +110,7 @@ function WahabOrderTable() {
                       flexShrink: 0
                     }}
                   >
-                    📊 Wahab Reports
+                    Wahab Reports
                   </button>
                   <button 
                     className="btn" 
