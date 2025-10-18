@@ -9,6 +9,7 @@ import SplashScreen from '../src/SplashScreen';
 import OrderForm from '../src/OrderForm';
 import Reports from '../src/Reports';
 import Profile from '../src/Profile';
+import WahabOrderTable from '../src/WahabOrderTable'; // Wahab component import
 
 function App() {
     // Splash screen state
@@ -46,6 +47,8 @@ function App() {
                     <Reports />
                 ) : currentView === 'profile' ? (
                     <Profile />
+                ) : currentView === 'wahabOrders' ? (
+                    <WahabOrderTable />
                 ) : (
                     <OrderForm onOrderAdded={() => {}} />
                 )}
