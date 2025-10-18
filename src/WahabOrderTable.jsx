@@ -73,29 +73,55 @@ function WahabOrderTable() {
             <WahabOrderForm onOrderAdded={handleRefresh} />
 
             <div className="table-card" style={{ marginTop: 16 }}>
-              <div className="table-toolbar">
+              <div className="table-toolbar" style={{ 
+                overflowX: 'auto',
+                display: 'flex',
+                flexWrap: 'nowrap',
+                gap: '16px'
+              }}>
                 <div className="toolbar-left">
                   <span className="kpi">
                     <span className="kpi-label">🏷️ Wahab Orders</span>
                     <span className="kpi-value">{orders.length}</span>
                   </span>
                 </div>
-                <div className="toolbar-right" style={{ gap: 12 }}>
+                <div className="toolbar-right" style={{ 
+                  gap: 12, 
+                  display: 'flex',
+                  overflowX: 'auto',
+                  minWidth: 0,
+                  paddingBottom: '4px'
+                }}>
                   <input
                     className="search"
                     type="text"
                     placeholder="Search Wahab Serial No..."
                     value={searchTerm}
                     onChange={(e)=>setSearchTerm(e.target.value)}
+                    style={{ minWidth: '200px', flexShrink: 0 }}
                   />
                   <button 
                     className="btn" 
                     onClick={() => setShowReports(true)}
-                    style={{ background: '#2563eb', color: 'white' }}
+                    style={{ 
+                      background: '#2563eb', 
+                      color: 'white',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}
                   >
                     📊 Wahab Reports
                   </button>
-                  <button className="btn" onClick={handleRefresh}>Refresh Wahab</button>
+                  <button 
+                    className="btn" 
+                    onClick={handleRefresh}
+                    style={{
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0
+                    }}
+                  >
+                    Refresh Wahab
+                  </button>
                 </div>
               </div>
 
