@@ -220,8 +220,8 @@ function OrderTable() {
                     ))}
                   </select>
                   <button className="btn" onClick={handleRefresh}>Refresh</button>
-                  <button 
-                    className="btn" 
+<button 
+                    className="btn btn-delete-all" 
                     onClick={handleDeleteAllOrders}
                     style={{
                       background: '#ef4444',
