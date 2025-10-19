@@ -287,3 +287,56 @@
     opacity: 0;
   }
 }
+
+/* Add Order button continuous animations like logo */
+.add-order-btn {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Rotating conic ring */
+.add-order-btn::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 12px;
+  background: conic-gradient(#0ea5e9, transparent 40%, #2563eb 70%, transparent 85%);
+  -webkit-mask: radial-gradient(circle at center, transparent 10px, #000 11px);
+  mask: radial-gradient(circle at center, transparent 10px, #000 11px);
+  animation: addOrderSpin 5s linear infinite;
+  opacity: 0.6;
+}
+
+/* Breathing border ring */
+.add-order-btn::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 12px;
+  border: 2px solid rgba(14,165,233,0.35);
+  animation: addOrderPulse 2.2s ease-in-out infinite;
+}
+
+/* Shine and halo for Add Order button */
+.add-order-btn .nav-shine {
+  position: absolute;
+  inset: -8px;
+  border-radius: 14px;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255,255,255,0) 35%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 65%);
+  transform: translateX(-130%);
+  animation: addOrderShine 5s ease-in-out 1s infinite;
+  mix-blend-mode: overlay;
+  z-index: 1;
+}
+
+/* Animation keyframes */
+@keyframes addOrderSpin { to { transform: rotate(360deg); } }
+@keyframes addOrderPulse { 0% { opacity:.4; transform: scale(.98); } 50% { opacity:.8; transform: scale(1.02);} 100% { opacity:.5; transform: scale(1);} }
+@keyframes addOrderShine { 0% { transform: translateX(-130%);} 45% { transform: translateX(130%);} 100% { transform: translateX(130%);} }
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .add-order-btn::before, .add-order-btn::after,
+  .add-order-btn .nav-shine { animation: none !important; }
+}
