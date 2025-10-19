@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -28,26 +28,25 @@ export default function DeletedOrdersReport() {
   const [deleted, setDeleted] = useState([]);
   const [err, setErr] = useState('');
 
-  // Load a preview (first page) for table view
-  useEffect(() => {
-    (async () => {
-      try {
-        setErr('');
-        const res = await axios.get(`${API_URL}/deleted?limit=50&page=1`);
-        const items = Array.isArray(res.data) ? res.data : [];
-        const norm = items.map((x, idx) => ({
-          idx: items.length - idx,
-          time: x.deletedAt || x.updatedAt || x.createdAt,
-          detail: x.serialNumber || x.originalId || '-',
-          owner: x.owner || 'Unknown',
-        }));
-        setDeleted(norm);
-      } catch (e) {
-        setErr('Failed to fetch deleted orders from server');
-        setDeleted([]);
-      }
-    })();
+  const fetchDeleted = useCallback(async () => {
+    try {
+      setErr('');
+      const res = await axios.get(`${API_URL}/deleted`);
+      const items = Array.isArray(res.data) ? res.data : [];
+      const norm = items.map((x, idx) => ({
+        idx: items.length - idx,
+        time: x.deletedAt || x.updatedAt || x.createdAt,
+        detail: x.serialNumber || x.originalId || '-',
+        owner: x.owner || 'Unknown',
+      }));
+      setDeleted(norm);
+    } catch (e) {
+      setErr('Failed to fetch deleted orders from server');
+      setDeleted([]);
+    }
   }, []);
+
+  useEffect(() => { fetchDeleted(); }, [fetchDeleted]);
 
   // Fetch all deleted orders from backend by paging (no practical limit for PDF)
   const fetchAllDeleted = async () => {
@@ -127,12 +126,27 @@ export default function DeletedOrdersReport() {
     <div className="profile-card" style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h3 style={{ margin: 0 }}>Deleted Orders Report</h3>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" onClick={downloadAll} disabled={busy} style={{
+        <div style={{ display:'flex', gap: 8, flexWrap:'wrap' }}>
+          <button type="button" onClick={downloadAll} disabled={!deleted.length || busy} style={{
             background: '#2563eb', color: '#fff', border: '1px solid #1e40af', padding: '8px 12px', borderRadius: 6,
-            cursor: !busy ? 'pointer' : 'not-allowed', transition: 'none', boxShadow: 'none'
+            cursor: deleted.length && !busy ? 'pointer' : 'not-allowed', transition: 'none', boxShadow: 'none'
           }}>
-            {busy ? 'Preparing…' : 'Download Deleted Orders'}
+{busy ? 'Preparing…' : 'Download PDF (All)'}
+          </button>
+          <button type="button" onClick={async()=>{
+            if (!deleted.length) return;
+            const ok = window.confirm(`Delete all ${deleted.length} archived entries? This cannot be undone.`);
+            if (!ok) return;
+            setBusy(true);
+            try {
+              await axios.delete(`${API_URL}/deleted`);
+              await fetchDeleted();
+            } catch (e) { setErr('Failed to clear deleted orders'); }
+            setBusy(false);
+          }} disabled={!deleted.length || busy} style={{
+            background:'#ef4444', color:'#fff', border:'1px solid #dc2626', padding:'8px 12px', borderRadius:6
+          }}>
+            Delete All
           </button>
         </div>
       </div>
