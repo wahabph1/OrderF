@@ -63,7 +63,7 @@ function WahabOrderTable() {
         try {
             await axios.delete(`${API_URL}/${targetOrder._id}`);
             setOrders(prev => prev.filter(o => o._id !== targetOrder._id));
-            logActivity({ type: 'delete', title: 'Wahab order deleted', detail: targetOrder.serialNumber || targetOrder._id });
+            logActivity({ type: 'delete', title: 'Wahab order deleted', detail: targetOrder.serialNumber || targetOrder._id, owner: targetOrder.owner || 'Wahab' });
         } catch(err) {
             alert('Failed to delete Wahab order.');
         } finally {

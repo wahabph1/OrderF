@@ -73,7 +73,7 @@ function OrderTable() {
         try {
             await axios.delete(`${API_URL}/${targetOrder._id}`);
             setOrders(prev => prev.filter(o => o._id !== targetOrder._id));
-            logActivity({ type: 'delete', title: 'Order deleted', detail: targetOrder.serialNumber || targetOrder._id });
+            logActivity({ type: 'delete', title: 'Order deleted', detail: targetOrder.serialNumber || targetOrder._id, owner: targetOrder.owner || 'Unknown' });
         } catch(err) {
             alert('Failed to delete order.');
         } finally {

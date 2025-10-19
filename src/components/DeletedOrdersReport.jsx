@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { readActivity } from '../utils/activity';
+import React, { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
@@ -9,18 +9,31 @@ function chunk(arr, size) {
   return out;
 }
 
+const API_URL = 'https://order-b.vercel.app/api/orders';
+
 export default function DeletedOrdersReport() {
   const [busy, setBusy] = useState(false);
+  const [deleted, setDeleted] = useState([]);
+  const [err, setErr] = useState('');
 
-  const deleted = useMemo(() => {
-    const items = (readActivity() || []).filter(x => x.type === 'delete');
-    // normalize
-    return items.map((x, idx) => ({
-      idx: items.length - idx, // reverse order index
-      time: x.time,
-      title: x.title || 'Deleted',
-      detail: x.detail || '-',
-    }));
+  useEffect(() => {
+    (async () => {
+      try {
+        setErr('');
+        const res = await axios.get(`${API_URL}/deleted`);
+        const items = Array.isArray(res.data) ? res.data : [];
+        const norm = items.map((x, idx) => ({
+          idx: items.length - idx,
+          time: x.deletedAt || x.updatedAt || x.createdAt,
+          detail: x.serialNumber || x.originalId || '-',
+          owner: x.owner || 'Unknown',
+        }));
+        setDeleted(norm);
+      } catch (e) {
+        setErr('Failed to fetch deleted orders from server');
+        setDeleted([]);
+      }
+    })();
   }, []);
 
   const groups = useMemo(() => chunk(deleted, 50), [deleted]);
@@ -28,6 +41,8 @@ export default function DeletedOrdersReport() {
   const downloadBatch = async (g) => {
     const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'A4' });
     const title = `Deleted Orders Report — Batch ${g + 1} of ${groups.length}`;
+    // Improve font embedding reliability across browsers
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(14);
     doc.text(title, 40, 40);
     doc.setFontSize(10);
@@ -36,20 +51,20 @@ export default function DeletedOrdersReport() {
     const body = groups[g].map((r, i) => [
       String(g * 50 + i + 1),
       new Date(r.time).toLocaleString(),
-      r.title,
       r.detail,
+      r.owner,
     ]);
 
     doc.autoTable({
       startY: 76,
-      head: [['#', 'Deleted At', 'Title', 'Detail']],
+      head: [['#', 'Deleted At', 'Serial/ID', 'Owner']],
       body,
       styles: { fontSize: 9, cellPadding: 6 },
       headStyles: { fillColor: [37, 99, 235] },
       columnStyles: {
         0: { cellWidth: 30 },
-        1: { cellWidth: 150 },
-        2: { cellWidth: 170 },
+        1: { cellWidth: 160 },
+        2: { cellWidth: 200 },
         3: { cellWidth: 'auto' },
       },
       didDrawPage: () => {
@@ -83,19 +98,29 @@ export default function DeletedOrdersReport() {
     <div className="profile-card" style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h3 style={{ margin: 0 }}>Deleted Orders Report</h3>
-        <button className="action-btn add-btn" onClick={downloadAll} disabled={!deleted.length || busy}>
+        <button type="button" onClick={downloadAll} disabled={!deleted.length || busy} style={{
+          background: '#2563eb', color: '#fff', border: '1px solid #1e40af', padding: '8px 12px', borderRadius: 6,
+          cursor: deleted.length && !busy ? 'pointer' : 'not-allowed', transition: 'none', boxShadow: 'none'
+        }}>
           {busy ? 'Preparing…' : `Download PDFs (${groups.length || 0})`}
         </button>
       </div>
       <p className="subtle" style={{ marginTop: 0 }}>
         Found {deleted.length} delete events in activity log. Files are generated in batches of 50 rows each.
       </p>
+      {err && <div className="status-message error-message" style={{color:'#b91c1c'}}>{err}</div>}
+
       {!deleted.length ? (
-        <div className="muted">No deletions recorded yet.</div>
+        <div className="muted">No deletions found.</div>
       ) : (
         <div style={{ margin: '8px 0 12px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {groups.map((_, i) => (
-            <button key={i} className="action-btn" onClick={() => downloadBatch(i)}>Download batch {i + 1}</button>
+            <button key={i} type="button" onClick={() => downloadBatch(i)} style={{
+              background: '#e5e7eb', color: '#111827', border: '1px solid #d1d5db', padding: '6px 10px', borderRadius: 6,
+              cursor: 'pointer', transition: 'none', boxShadow: 'none'
+            }}>
+              Download batch {i + 1}
+            </button>
           ))}
         </div>
       )}
@@ -107,8 +132,8 @@ export default function DeletedOrdersReport() {
               <tr>
                 <th style={{ textAlign: 'left', padding: '8px 6px'}}>#</th>
                 <th style={{ textAlign: 'left', padding: '8px 6px'}}>Deleted At</th>
-                <th style={{ textAlign: 'left', padding: '8px 6px'}}>Title</th>
-                <th style={{ textAlign: 'left', padding: '8px 6px'}}>Detail</th>
+                <th style={{ textAlign: 'left', padding: '8px 6px'}}>Serial/ID</th>
+                <th style={{ textAlign: 'left', padding: '8px 6px'}}>Owner</th>
               </tr>
             </thead>
             <tbody>
@@ -116,8 +141,8 @@ export default function DeletedOrdersReport() {
                 <tr key={`${r.time}-${i}`}>
                   <td style={{ padding: '6px' }}>{i + 1}</td>
                   <td style={{ padding: '6px' }}>{new Date(r.time).toLocaleString()}</td>
-                  <td style={{ padding: '6px' }}>{r.title}</td>
                   <td style={{ padding: '6px' }}>{r.detail}</td>
+                  <td style={{ padding: '6px' }}>{r.owner}</td>
                 </tr>
               ))}
             </tbody>
