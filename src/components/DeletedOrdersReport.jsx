@@ -79,6 +79,40 @@ export default function DeletedOrdersReport() {
     doc.save(filename);
   };
 
+  const downloadFirst5 = () => {
+    const subset = deleted.slice(0, 5);
+    if (!subset.length) return;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'A4' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text('Deleted Orders — First 5', 40, 40);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 58);
+
+    const body = subset.map((r, i) => [
+      String(i + 1),
+      new Date(r.time).toLocaleString(),
+      r.detail,
+      r.owner,
+    ]);
+
+    doc.autoTable({
+      startY: 76,
+      head: [['#', 'Deleted At', 'Serial/ID', 'Owner']],
+      body,
+      styles: { fontSize: 9, cellPadding: 6 },
+      headStyles: { fillColor: [37, 99, 235] },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 160 },
+        2: { cellWidth: 200 },
+        3: { cellWidth: 'auto' },
+      },
+    });
+
+    doc.save('deleted-orders-first-5.pdf');
+  };
+
   const downloadAll = async () => {
     if (!deleted.length) return;
     setBusy(true);
@@ -98,12 +132,20 @@ export default function DeletedOrdersReport() {
     <div className="profile-card" style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <h3 style={{ margin: 0 }}>Deleted Orders Report</h3>
-        <button type="button" onClick={downloadAll} disabled={!deleted.length || busy} style={{
-          background: '#2563eb', color: '#fff', border: '1px solid #1e40af', padding: '8px 12px', borderRadius: 6,
-          cursor: deleted.length && !busy ? 'pointer' : 'not-allowed', transition: 'none', boxShadow: 'none'
-        }}>
-          {busy ? 'Preparing…' : `Download PDFs (${groups.length || 0})`}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button type="button" onClick={downloadFirst5} disabled={!deleted.length} style={{
+            background: '#059669', color: '#fff', border: '1px solid #047857', padding: '8px 12px', borderRadius: 6,
+            cursor: deleted.length ? 'pointer' : 'not-allowed', transition: 'none', boxShadow: 'none'
+          }}>
+            Download first 5
+          </button>
+          <button type="button" onClick={downloadAll} disabled={!deleted.length || busy} style={{
+            background: '#2563eb', color: '#fff', border: '1px solid #1e40af', padding: '8px 12px', borderRadius: 6,
+            cursor: deleted.length && !busy ? 'pointer' : 'not-allowed', transition: 'none', boxShadow: 'none'
+          }}>
+            {busy ? 'Preparing…' : `Download PDFs (${groups.length || 0})`}
+          </button>
+        </div>
       </div>
       <p className="subtle" style={{ marginTop: 0 }}>
         Found {deleted.length} delete events in activity log. Files are generated in batches of 50 rows each.
