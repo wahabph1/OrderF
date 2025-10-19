@@ -1,24 +1,22 @@
 import React from 'react';
 import DeletedOrdersReport from './components/DeletedOrdersReport';
 import InvoiceGenerator from './components/InvoiceGenerator';
+import './styles/Profile.css';
 
 export default function Profile() {
   return (
-    <div className="profile-container" style={{ padding: 24 }}>
-      <div className="profile-header" style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-        <div
-          className="avatar"
-          style={{ width: 48, height: 48, borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}
-        >
-          AW
-        </div>
-        <div>
-          <h2 className="profile-name" style={{ margin: 0 }}>Profile</h2>
-          <p className="profile-sub subtle" style={{ margin: 0, opacity: 0.7 }}>Clean slate — add your new functionality here.</p>
+    <div className="profile-container profile-page" style={{ padding: 24 }}>
+      <div className="profile-hero">
+        <div className="profile-hero-inner">
+          <div className="profile-avatar">AW</div>
+          <div>
+            <h2 className="profile-title">Your Profile</h2>
+            <p className="profile-subtle">Manage reports, exports and invoices — polished and fast.</p>
+          </div>
         </div>
       </div>
 
-      <div className="profile-grid" style={{ display: 'grid', gap: 16 }}>
+      <div className="profile-grid">
         <DeletedOrdersReport />
         <InvoiceGenerator />
       </div>
