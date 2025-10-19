@@ -23,69 +23,106 @@ export default function AutoDetect() {
     r.readAsDataURL(f);
   };
 
-  const preprocessImage = async (src) => {
+  const drawRotated = (img, angleDeg, scaleFactor = 2) => {
+    const rad = (angleDeg * Math.PI) / 180;
+    const sin = Math.abs(Math.sin(rad));
+    const cos = Math.abs(Math.cos(rad));
+    const w = img.width * scaleFactor;
+    const h = img.height * scaleFactor;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.floor(w * cos + h * sin);
+    canvas.height = Math.floor(w * sin + h * cos);
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(rad);
+    ctx.drawImage(img, -w / 2, -h / 2, w, h);
+    return canvas;
+  };
+
+  const preprocessImage = async (src, angle = 0) => {
     return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxW = 1600;
-        const scale = Math.min(1, maxW / img.width);
-        canvas.width = Math.floor(img.width * scale);
-        canvas.height = Math.floor(img.height * scale);
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // upscale + rotate
+        const base = drawRotated(img, angle, 2);
+        const ctx = base.getContext('2d');
+        const imageData = ctx.getImageData(0, 0, base.width, base.height);
         const data = imageData.data;
-        // grayscale + contrast + simple threshold
-        // emphasize red text: convert to grayscale using max channel
+        // adaptive-ish threshold using running mean (simple, fast)
+        let sum = 0;
         for (let i = 0; i < data.length; i += 4) {
           const r = data[i], g = data[i+1], b = data[i+2];
-          let v = Math.max(r, g, b); // max-channel grayscale
-          // increase contrast
-          v = (v - 128) * 1.2 + 128;
-          // threshold
-          const t = v > 150 ? 255 : 0;
+          const v = Math.max(r, g, b); // emphasize colored text
+          sum += v;
+        }
+        const avg = sum / (data.length / 4);
+        const thresh = Math.max(140, Math.min(190, avg + 10));
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i+1], b = data[i+2];
+          let v = Math.max(r, g, b);
+          // slight contrast boost
+          v = (v - 128) * 1.25 + 128;
+          const t = v > thresh ? 255 : 0;
           data[i] = data[i+1] = data[i+2] = t;
         }
         ctx.putImageData(imageData, 0, 0);
-        resolve(canvas.toDataURL('image/png'));
+        resolve(base.toDataURL('image/png'));
       };
       img.src = src;
     });
+  };
+
+  const recognizeOnce = async (src, psm = '6') => {
+    const Tesseract = await import('tesseract.js');
+    const opts = { logger: () => {}, tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-', preserve_interword_spaces: '1', tessedit_pageseg_mode: psm };
+    const { data } = await Tesseract.recognize(src, 'eng', opts);
+    return data;
+  };
+
+  const pickSerial = (t) => {
+    const serialRegexes = [
+      /S\s*\.?\s*NO\s*[:#-]?\s*([A-Z0-9-]{3,})/i,
+      /S\s*\/?\s*NO\s*[:#-]?\s*([A-Z0-9-]{3,})/i,
+      /Serial\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
+      /Invoice\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
+      /Order\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
+      /\b([A-Z]{1,3}-?\d{4,})\b/,
+      /\b(\d{5,})\b/
+    ];
+    for (const rx of serialRegexes) {
+      const m = t.match(rx);
+      if (m) return m[1] || m[0];
+    }
+    return '';
   };
 
   const runOCR = async () => {
     if (!imgSrc) return;
     setBusy(true); setErr(''); setText('');
     try {
-      const processed = await preprocessImage(imgSrc);
-      const Tesseract = await import('tesseract.js');
-      const { data } = await Tesseract.recognize(processed, 'eng', { logger: () => {}, tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-', preserve_interword_spaces: '1' });
-      const t = (data?.text || '').replace(/\uFFFD/g, '');
-      setText(t);
-      // Serial patterns: S.NO 67676, S/NO: 12345, S-No 123, Serial # ABC-1234
-      const serialRegexes = [
-        /S\s*\.?\s*NO\s*[:#-]?\s*([A-Z0-9-]{3,})/i,
-        /S\s*\/?\s*NO\s*[:#-]?\s*([A-Z0-9-]{3,})/i,
-        /Serial\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
-        /Invoice\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
-        /Order\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
-        /\b([A-Z]{1,3}-?\d{4,})\b/,
-        /\b(\d{5,})\b/ // plain digits fallback
-      ];
-      let serial = '';
-      for (const rx of serialRegexes) {
-        const m = t.match(rx);
-        if (m) { serial = m[1] || m[0]; break; }
+      const angles = [0, 90, 180, 270];
+      let best = { score: -1, text: '', serial: '', date: '', owner: '' };
+      for (const angle of angles) {
+        const processed = await preprocessImage(imgSrc, angle);
+        const d1 = await recognizeOnce(processed, '6');
+        const d2 = await recognizeOnce(processed, '7');
+        const candidates = [d1, d2];
+        for (const d of candidates) {
+          const raw = (d?.text || '').replace(/\uFFFD/g, '');
+          const serial = pickSerial(raw);
+          const dateMatch = raw.match(/(\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2})|(\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})/);
+          const ownerFound = owners.find(o => new RegExp(o, 'i').test(raw)) || '';
+          const score = (serial ? serial.replace(/[^A-Z0-9]/gi,'').length * 10 : 0) + (d?.confidence || 0) + (ownerFound ? 5 : 0);
+          if (score > best.score) best = { score, text: raw, serial, date: dateMatch ? dateMatch[0] : '', owner: ownerFound };
+        }
       }
-      const dateMatch = t.match(/(\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2})|(\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})/);
-      const ownerFound = owners.find(o => new RegExp(o, 'i').test(t));
+      setText(best.text);
       setForm(prev => ({
         ...prev,
-        serialNumber: serial || prev.serialNumber,
-        orderDate: dateMatch ? normalizeDate(dateMatch[0]) : prev.orderDate,
-        owner: ownerFound || prev.owner
+        serialNumber: best.serial || prev.serialNumber,
+        orderDate: best.date ? normalizeDate(best.date) : prev.orderDate,
+        owner: best.owner || prev.owner
       }));
     } catch (e) {
       setErr('OCR failed. Try a clearer image.');
