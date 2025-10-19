@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 
-function WahabLogin({ onLoginSuccess, onClose }) {
+function WahabLogin({ onLoginSuccess, onClose, targetView }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -85,7 +85,7 @@ function WahabLogin({ onLoginSuccess, onClose }) {
                         fontSize: '24px',
                         fontWeight: 'bold'
                     }}>
-                        W
+                        🔒
                     </div>
                     <h2 style={{ 
                         margin: 0, 
@@ -93,14 +93,14 @@ function WahabLogin({ onLoginSuccess, onClose }) {
                         fontWeight: '600',
                         color: '#1f2937'
                     }}>
-                        Wahab Orders Access
+                        {targetView === 'profile' ? 'Profile Access' : 'Wahab Orders Access'}
                     </h2>
                     <p style={{ 
                         margin: '8px 0 0', 
                         color: '#6b7280',
                         fontSize: '14px'
                     }}>
-                        Enter your credentials to access Wahab orders
+                        {targetView === 'profile' ? 'Enter your credentials to access your profile' : 'Enter your credentials to access Wahab orders'}
                     </p>
                 </div>
 
@@ -197,7 +197,7 @@ function WahabLogin({ onLoginSuccess, onClose }) {
                             transition: 'all 0.2s'
                         }}
                     >
-                        {loading ? 'Authenticating...' : 'Access Wahab Orders'}
+                        {loading ? 'Authenticating...' : (targetView === 'profile' ? 'Access Profile' : 'Access Wahab Orders')}
                     </button>
                 </form>
             </div>

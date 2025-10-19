@@ -121,6 +121,7 @@ function App() {
                 <WahabLogin 
                     onLoginSuccess={handleWahabLoginSuccess}
                     onClose={handleWahabLoginClose}
+                    targetView={protectedTarget}
                 />
             )}
             
