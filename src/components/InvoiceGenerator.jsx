@@ -110,10 +110,6 @@ export default function InvoiceGenerator() {
         ))}
       </div>
 
-      <div className="muted" style={{ marginBottom: 12 }}>
-        <label>Note</label>
-        <textarea rows={2} value={form.note} onChange={e=>setForm({ ...form, note: e.target.value })} />
-      </div>
 
       {/* Invoice Preview (Captured) */}
       <div ref={previewRef} style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:12, overflow:'hidden' }}>
