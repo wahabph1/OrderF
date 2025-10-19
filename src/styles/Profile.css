@@ -99,6 +99,10 @@
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @keyframes floatGlow {
   0%,100% { transform: translate3d(0,0,0) rotate(0deg); }
   50% { transform: translate3d(0,-6px,0) rotate(1deg); }
