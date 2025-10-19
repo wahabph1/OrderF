@@ -298,8 +298,8 @@ function OrderTable() {
                             )}
                           </td>
 <td data-label="Actions" className="actions-cell">
-                            <button className="btn btn-edit" onClick={()=>handleEditClick(order)}>✏️ Edit</button>
-                            <button className="btn btn-delete" onClick={()=>handleDelete(order._id, order.serialNumber)}>🗑️ Delete</button>
+                            <button className="btn btn-edit" onClick={()=>handleEditClick(order)}>Edit</button>
+                            <button className="btn btn-delete" onClick={()=>handleDelete(order._id, order.serialNumber)}>Delete</button>
                           </td>
                         </tr>
                       ))}
