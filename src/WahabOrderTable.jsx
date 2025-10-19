@@ -6,6 +6,10 @@ import WahabOrderForm from './WahabOrderForm';
 import EditOrderModal from './EditOrderModal';
 import WahabReports from './WahabReports';
 import './styles/table.css';
+import ConfirmDialog from './components/ConfirmDialog';
+import Modal from './components/Modal';
+import LoadingPopup from './components/LoadingPopup';
+import { logActivity } from './utils/activity';
 
 const API_URL = 'https://order-b.vercel.app/api/orders';
 const statusOptions = ['Pending', 'In Transit', 'Delivered', 'Cancelled'];
@@ -21,6 +25,10 @@ function WahabOrderTable() {
     const [showReports, setShowReports] = useState(false);
     const [editingStatusId, setEditingStatusId] = useState(null);
     const [showAddModal, setShowAddModal] = useState(false);
+    // Delete confirmations
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmAllOpen, setConfirmAllOpen] = useState(false);
+    const [targetOrder, setTargetOrder] = useState(null);
 
     // Fetch only Wahab orders
     const fetchWahabOrders = useCallback(async () => {
@@ -45,14 +53,22 @@ function WahabOrderTable() {
         }
     }, [searchTerm]);
 
-    const handleDelete = async (id, serialNumber) => {
-        if (window.confirm(`Are you sure you want to delete Wahab order ${serialNumber}?`)) {
-            try {
-                await axios.delete(`${API_URL}/${id}`);
-                setOrders(prev => prev.filter(o => o._id !== id));
-            } catch(err) {
-                alert('Failed to delete Wahab order.');
-            }
+    const askDelete = (order) => {
+        setTargetOrder(order);
+        setConfirmOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!targetOrder) return;
+        try {
+            await axios.delete(`${API_URL}/${targetOrder._id}`);
+            setOrders(prev => prev.filter(o => o._id !== targetOrder._id));
+            logActivity({ type: 'delete', title: 'Wahab order deleted', detail: targetOrder.serialNumber || targetOrder._id });
+        } catch(err) {
+            alert('Failed to delete Wahab order.');
+        } finally {
+            setConfirmOpen(false);
+            setTargetOrder(null);
         }
     };
 
@@ -71,6 +87,7 @@ function WahabOrderTable() {
                     : order
             ));
             setEditingStatusId(null);
+            logActivity({ type: 'status', title: 'Wahab status updated', detail: `${orderId} → ${newStatus}` });
         } catch (err) {
             alert('Failed to update status.');
             console.error(err);
@@ -83,26 +100,25 @@ function WahabOrderTable() {
     };
     
     // Delete all Wahab orders
-    const handleDeleteAllOrders = async () => {
+    const handleDeleteAllOrders = () => {
         if (orders.length === 0) {
             alert('No Wahab orders to delete');
             return;
         }
-        
-        if (window.confirm(`Are you sure you want to delete ALL ${orders.length} Wahab orders? This action cannot be undone!`)) {
-            try {
-                // Delete all orders from backend
-                const deletePromises = orders.map(order => 
-                    axios.delete(`${API_URL}/${order._id}`)
-                );
-                
-                await Promise.all(deletePromises);
-                setOrders([]);
-                alert('✅ All Wahab orders deleted successfully!');
-            } catch (err) {
-                alert('❌ Failed to delete some Wahab orders. Please try again.');
-                console.error(err);
-            }
+        setConfirmAllOpen(true);
+    };
+
+    const confirmDeleteAll = async () => {
+        try {
+            const deletePromises = orders.map(order => axios.delete(`${API_URL}/${order._id}`));
+            await Promise.all(deletePromises);
+            setOrders([]);
+            logActivity({ type: 'delete', title: 'All Wahab orders deleted', detail: `${orders.length} orders` });
+        } catch (err) {
+            alert('❌ Failed to delete some Wahab orders. Please try again.');
+            console.error(err);
+        } finally {
+            setConfirmAllOpen(false);
         }
     };
 
@@ -113,11 +129,12 @@ function WahabOrderTable() {
 
     const statusClass = (s) => `status status--${String(s || '').toLowerCase().replace(/\\s+/g,'-')}`;
 
-    if (loading) return <p style={{textAlign:'center'}}>Loading Wahab orders...</p>;
+    // Animated popup will cover UI when loading; no inline text
     if (error) return <p style={{color:'red', textAlign:'center'}}>{error}</p>;
 
     return (
         <div className="container">
+            <LoadingPopup open={loading} />
             {/* Add Wahab Order Button */}
             <div style={{ marginBottom: '16px', marginTop: '16px', textAlign: 'right' }}>
                 <button
@@ -316,7 +333,7 @@ function WahabOrderTable() {
                           </td>
                           <td data-label="Actions" className="actions-cell">
                             <button className="btn btn-edit" onClick={()=>handleEditClick(order)}>Edit</button>
-                            <button className="btn btn-delete" onClick={()=>handleDelete(order._id, order.serialNumber)}>Delete</button>
+                            <button className="btn btn-delete" onClick={()=>askDelete(order)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -366,98 +383,36 @@ function WahabOrderTable() {
             )}
 
             {/* Add Wahab Order Modal */}
-            {showAddModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0,0,0,0.6)',
-                    zIndex: 1000,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '20px',
-                    animation: 'fadeIn 0.3s ease-out'
-                }}>
-                    <div style={{
-                        background: 'white',
-                        borderRadius: '16px',
-                        maxWidth: '500px',
-                        width: '100%',
-                        maxHeight: '90vh',
-                        overflow: 'auto',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        transform: 'scale(1)',
-                        animation: 'slideUp 0.3s ease-out'
-                    }}>
-                        {/* Modal Header */}
-                        <div style={{
-                            padding: '24px 24px 0',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            <h2 style={{
-                                margin: 0,
-                                fontSize: '24px',
-                                fontWeight: '600',
-                                color: '#1f2937',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px'
-                            }}>
-                                <span style={{
-                                    background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                                    color: 'white',
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '18px'
-                                }}>+</span>
-                                Add Wahab Order
-                            </h2>
-                            <button
-                                onClick={() => setShowAddModal(false)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    fontSize: '28px',
-                                    cursor: 'pointer',
-                                    color: '#9ca3af',
-                                    padding: '4px',
-                                    borderRadius: '6px',
-                                    transition: 'all 0.2s'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = '#ef4444';
-                                    e.target.style.background = '#fef2f2';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = '#9ca3af';
-                                    e.target.style.background = 'none';
-                                }}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        
-                        {/* Modal Body */}
-                        <div style={{ padding: '0 24px 24px' }}>
-                            <WahabOrderForm 
-                                onOrderAdded={() => {
-                                    handleRefresh();
-                                    setShowAddModal(false);
-                                }} 
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal open={showAddModal} title="Add Wahab Order" onClose={() => setShowAddModal(false)}>
+              <WahabOrderForm 
+                onOrderAdded={() => {
+                  handleRefresh();
+                  setShowAddModal(false);
+                }} 
+              />
+            </Modal>
+
+            {/* Delete confirmation dialogs */}
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Delete this Wahab order?"
+                description={targetOrder ? `Serial ${targetOrder.serialNumber} will be permanently removed.` : ''}
+                confirmText="Delete"
+                cancelText="Cancel"
+                onConfirm={confirmDelete}
+                onCancel={() => { setConfirmOpen(false); setTargetOrder(null); }}
+                danger
+            />
+            <ConfirmDialog
+                open={confirmAllOpen}
+                title="Delete ALL Wahab orders?"
+                description={`This will remove ${orders.length} Wahab orders permanently.`}
+                confirmText="Delete All"
+                cancelText="Cancel"
+                onConfirm={confirmDeleteAll}
+                onCancel={() => setConfirmAllOpen(false)}
+                danger
+            />
         </div>
     );
 }

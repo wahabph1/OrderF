@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import KpiInsights from './components/KpiInsights';
+import ActivityIntegrations from './components/ActivityIntegrations';
 
 // Reuse backend orders for demo of "Current Orders"
 const API_URL = 'https://order-b.vercel.app/api/orders';
@@ -314,6 +316,16 @@ export default function Profile() {
 
         <Section title="Support Tickets" action={<span className="badge subtle">Support</span>}>
           <SupportTickets />
+        </Section>
+
+        <Section title="Business KPIs (30 days)">
+          {/* KPIs: last 30 days chart, delivery/cancel rate, owner split, top products/customers */}
+          <KpiInsights />
+        </Section>
+
+        <Section title="Activity & Integrations">
+          {/* Timeline, API keys, Google Sheets export, template order */}
+          <ActivityIntegrations />
         </Section>
       </div>
     </div>

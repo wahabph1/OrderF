@@ -3,6 +3,10 @@ import axios from 'axios';
 import OrderForm from './OrderForm'; 
 import EditOrderModal from './EditOrderModal'; 
 import './styles/table.css';
+import ConfirmDialog from './components/ConfirmDialog';
+import Modal from './components/Modal';
+import LoadingPopup from './components/LoadingPopup';
+import { logActivity } from './utils/activity';
 
 const API_URL = 'https://order-b.vercel.app/api/orders';
 // Removed 'All' option and excluded Wahab from main dashboard
@@ -20,6 +24,10 @@ function OrderTable() {
     const [currentOrder, setCurrentOrder] = useState(null);
     const [editingStatusId, setEditingStatusId] = useState(null);
     const [showAddModal, setShowAddModal] = useState(false);
+    // Delete confirmations
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmAllOpen, setConfirmAllOpen] = useState(false);
+    const [targetOrder, setTargetOrder] = useState(null);
 
     const fetchOrders = useCallback(async () => {
         setLoading(true); 
@@ -55,14 +63,22 @@ function OrderTable() {
         } finally { setLoading(false); }
     }, [filterOwner, searchTerm]);
 
-    const handleDelete = async (id, serialNumber) => {
-        if (window.confirm(`Are you sure you want to delete order ${serialNumber}?`)) {
-            try {
-                await axios.delete(`${API_URL}/${id}`);
-                setOrders(prev => prev.filter(o => o._id !== id));
-            } catch(err) {
-                alert('Failed to delete order.');
-            }
+    const askDelete = (order) => {
+        setTargetOrder(order);
+        setConfirmOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!targetOrder) return;
+        try {
+            await axios.delete(`${API_URL}/${targetOrder._id}`);
+            setOrders(prev => prev.filter(o => o._id !== targetOrder._id));
+            logActivity({ type: 'delete', title: 'Order deleted', detail: targetOrder.serialNumber || targetOrder._id });
+        } catch(err) {
+            alert('Failed to delete order.');
+        } finally {
+            setConfirmOpen(false);
+            setTargetOrder(null);
         }
     };
 
@@ -81,6 +97,7 @@ function OrderTable() {
                     : order
             ));
             setEditingStatusId(null);
+            logActivity({ type: 'status', title: 'Status updated', detail: `${orderId} → ${newStatus}` });
         } catch (err) {
             alert('Failed to update status.');
             console.error(err);
@@ -93,26 +110,25 @@ function OrderTable() {
     };
     
     // Delete all orders
-    const handleDeleteAllOrders = async () => {
+    const handleDeleteAllOrders = () => {
         if (orders.length === 0) {
             alert('No orders to delete');
             return;
         }
-        
-        if (window.confirm(`Are you sure you want to delete ALL ${orders.length} orders? This action cannot be undone!`)) {
-            try {
-                // Delete all orders from backend
-                const deletePromises = orders.map(order => 
-                    axios.delete(`${API_URL}/${order._id}`)
-                );
-                
-                await Promise.all(deletePromises);
-                setOrders([]);
-                alert('✅ All orders deleted successfully!');
-            } catch (err) {
-                alert('❌ Failed to delete some orders. Please try again.');
-                console.error(err);
-            }
+        setConfirmAllOpen(true);
+    };
+
+    const confirmDeleteAll = async () => {
+        try {
+            const deletePromises = orders.map(order => axios.delete(`${API_URL}/${order._id}`));
+            await Promise.all(deletePromises);
+            setOrders([]);
+            logActivity({ type: 'delete', title: 'All orders deleted', detail: `${orders.length} orders` });
+        } catch (err) {
+            alert('❌ Failed to delete some orders. Please try again.');
+            console.error(err);
+        } finally {
+            setConfirmAllOpen(false);
         }
     };
 
@@ -123,11 +139,12 @@ function OrderTable() {
 
     const statusClass = (s) => `status status--${String(s || '').toLowerCase().replace(/\s+/g,'-')}`;
 
-    if (loading) return <p style={{textAlign:'center'}}>Loading orders...</p>;
+    // Show animated popup instead of inline loading text
     if (error) return <p style={{color:'red', textAlign:'center'}}>{error}</p>;
 
     return (
         <div className="container">
+            <LoadingPopup open={loading} />
             {/* Add Order Button */}
             <div style={{ marginBottom: '16px', marginTop: '16px', textAlign: 'right' }}>
                 <button
@@ -288,7 +305,7 @@ function OrderTable() {
                           </td>
 <td data-label="Actions" className="actions-cell">
                             <button className="btn btn-edit" onClick={()=>handleEditClick(order)}>Edit</button>
-                            <button className="btn btn-delete" onClick={()=>handleDelete(order._id, order.serialNumber)}>Delete</button>
+                            <button className="btn btn-delete" onClick={()=>askDelete(order)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -311,98 +328,36 @@ function OrderTable() {
             )}
 
             {/* Add Order Modal */}
-            {showAddModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'rgba(0,0,0,0.6)',
-                    zIndex: 1000,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '20px',
-                    animation: 'fadeIn 0.3s ease-out'
-                }}>
-                    <div style={{
-                        background: 'white',
-                        borderRadius: '16px',
-                        maxWidth: '500px',
-                        width: '100%',
-                        maxHeight: '90vh',
-                        overflow: 'auto',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                        transform: 'scale(1)',
-                        animation: 'slideUp 0.3s ease-out'
-                    }}>
-                        {/* Modal Header */}
-                        <div style={{
-                            padding: '24px 24px 0',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                        }}>
-                            <h2 style={{
-                                margin: 0,
-                                fontSize: '24px',
-                                fontWeight: '600',
-                                color: '#1f2937',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px'
-                            }}>
-                                <span style={{
-                                    background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-                                    color: 'white',
-                                    width: '32px',
-                                    height: '32px',
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '18px'
-                                }}>+</span>
-                                Add New Order
-                            </h2>
-                            <button
-                                onClick={() => setShowAddModal(false)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    fontSize: '28px',
-                                    cursor: 'pointer',
-                                    color: '#9ca3af',
-                                    padding: '4px',
-                                    borderRadius: '6px',
-                                    transition: 'all 0.2s'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.color = '#ef4444';
-                                    e.target.style.background = '#fef2f2';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.color = '#9ca3af';
-                                    e.target.style.background = 'none';
-                                }}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        
-                        {/* Modal Body */}
-                        <div style={{ padding: '0 24px 24px' }}>
-                            <OrderForm 
-                                onOrderAdded={() => {
-                                    handleRefresh();
-                                    setShowAddModal(false);
-                                }} 
-                            />
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Modal open={showAddModal} title="Add New Order" onClose={() => setShowAddModal(false)}>
+              <OrderForm 
+                onOrderAdded={() => {
+                  handleRefresh();
+                  setShowAddModal(false);
+                }} 
+              />
+            </Modal>
+
+            {/* Delete confirmation dialogs */}
+            <ConfirmDialog
+                open={confirmOpen}
+                title="Delete this order?"
+                description={targetOrder ? `Serial ${targetOrder.serialNumber} will be permanently removed.` : ''}
+                confirmText="Delete"
+                cancelText="Cancel"
+                onConfirm={confirmDelete}
+                onCancel={() => { setConfirmOpen(false); setTargetOrder(null); }}
+                danger
+            />
+            <ConfirmDialog
+                open={confirmAllOpen}
+                title="Delete ALL orders?"
+                description={`This will remove ${orders.length} orders permanently.`}
+                confirmText="Delete All"
+                cancelText="Cancel"
+                onConfirm={confirmDeleteAll}
+                onCancel={() => setConfirmAllOpen(false)}
+                danger
+            />
         </div>
     );
 }

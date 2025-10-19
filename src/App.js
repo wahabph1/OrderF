@@ -1,7 +1,7 @@
 // Frontend/src/App.js
 
 import './App.css'; 
-import React, { useState, useEffect } from 'react'; // <--- useState aur useEffect import kiya
+import React, { useState, useEffect, useRef } from 'react'; // <--- useState, useEffect, useRef import kiya
 import OrderTable from '../src/OrderTable'; 
 import Navbar from '../src/Navbar';
 import SplashScreen from '../src/SplashScreen';
@@ -12,6 +12,7 @@ import WahabOrderTable from '../src/WahabOrderTable'; // Wahab component import
 import WahabLogin from '../src/WahabLogin'; // Wahab authentication
 import ProfitCalculator from '../src/ProfitCalculator'; // Profit Calculator
 import Dashboard from './Dashboard';
+import LoadingPopup from './components/LoadingPopup';
 
 function App() {
     // Splash screen state
@@ -23,6 +24,16 @@ function App() {
     // Wahab authentication states
     const [showWahabLogin, setShowWahabLogin] = useState(false);
     const [wahabAuthenticated, setWahabAuthenticated] = useState(false);
+
+    // Global page transition overlay
+    const [transitioning, setTransitioning] = useState(false);
+    const transTimer = useRef(null);
+
+    const startTransition = () => {
+        if (transTimer.current) clearTimeout(transTimer.current);
+        setTransitioning(true);
+        transTimer.current = setTimeout(() => setTransitioning(false), 600);
+    };
     
     // No persistent authentication - always require login after refresh
     // Reset to dashboard if trying to access wahabOrders without authentication
@@ -39,11 +50,13 @@ function App() {
             // Always require authentication for Wahab Orders
             if (wahabAuthenticated) {
                 setCurrentView(view);
+                startTransition();
             } else {
                 setShowWahabLogin(true);
             }
         } else {
             setCurrentView(view);
+            startTransition();
         }
     };
     
@@ -52,6 +65,7 @@ function App() {
         setWahabAuthenticated(true);
         setCurrentView('wahabOrders');
         setShowWahabLogin(false);
+        startTransition();
     };
     
     // Handle login modal close
@@ -63,6 +77,11 @@ function App() {
     const handleSplashEnd = () => {
         setShowSplash(false);
     };
+
+    // Cleanup transition timer on unmount
+    useEffect(() => {
+        return () => { if (transTimer.current) clearTimeout(transTimer.current); };
+    }, []);
 
     // Show splash screen first
     if (showSplash) {
@@ -91,7 +110,9 @@ function App() {
                     <OrderForm onOrderAdded={() => {}} />
                 )}
             </main>
-            
+
+            {/* Global page transition overlay */}
+            <LoadingPopup open={transitioning} label="Loading" />
             
             {/* Wahab Authentication Modal */}
             {showWahabLogin && (

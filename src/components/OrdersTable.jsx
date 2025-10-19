@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ConfirmDialog from './ConfirmDialog';
 
 const currency = (n) => new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(n);
 
-export default function OrdersTable({ orders = [] }) {
+export default function OrdersTable({ orders = [], onDelete }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [target, setTarget] = useState(null);
+
+  const askDelete = (order) => {
+    setTarget(order);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    if (onDelete && target) onDelete(target);
+    setConfirmOpen(false);
+    setTarget(null);
+  };
+
   return (
     <div className="table-card">
       <div className="table-toolbar">
@@ -29,7 +44,7 @@ export default function OrdersTable({ orders = [] }) {
               <th>Price</th>
               <th>Status</th>
               <th>Date</th>
-              <th style={{ width: 60 }}>Action</th>
+              <th style={{ width: 90 }}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -54,8 +69,9 @@ export default function OrdersTable({ orders = [] }) {
                   </span>
                 </td>
                 <td>{new Date(o.date).toLocaleDateString()}</td>
-                <td>
+                <td style={{ display: 'flex', gap: 6 }}>
                   <button className="icon-btn" title="View">👁️</button>
+                  <button className="icon-btn" title="Delete" onClick={() => askDelete(o)}>🗑️</button>
                 </td>
               </tr>
             ))}
@@ -70,6 +86,17 @@ export default function OrdersTable({ orders = [] }) {
           <button className="btn btn-light">Next {'\u203A'}</button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete this order?"
+        description={target ? `Order ${target.id} (${target.customer}) will be permanently removed.` : ''}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmOpen(false)}
+        danger
+      />
     </div>
   );
 }

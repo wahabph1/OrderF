@@ -21,14 +21,11 @@ function Navbar({ onNavClick, currentView }) {
           className="brand"
           onClick={() => handleNavClick('dashboard')}
           aria-label={`${projectName} home`}
+        >
           <span className="brand-logo-wrap">
-            <span className="brand-logo nav-logo-pop" aria-hidden>
-              <span style={{color: '#007bff', fontWeight: 'bold'}}>Track</span>
-              <span style={{color: '#28a745', fontWeight: 'bold'}}>Mate</span>
-            </span>
+            <span className="brand-logo nav-logo-pop" aria-hidden>TM</span>
             <span className="logo-shine" aria-hidden></span>
             <span className="logo-halo" aria-hidden></span>
-          </span>
           </span>
           <span className="brand-name">{projectName}</span>
         </button>
