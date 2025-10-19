@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { readActivity } from '../utils/activity';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
 function chunk(arr, size) {
@@ -25,50 +25,54 @@ export default function DeletedOrdersReport() {
 
   const groups = useMemo(() => chunk(deleted, 50), [deleted]);
 
+  const downloadBatch = async (g) => {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'A4' });
+    const title = `Deleted Orders Report — Batch ${g + 1} of ${groups.length}`;
+    doc.setFontSize(14);
+    doc.text(title, 40, 40);
+    doc.setFontSize(10);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 58);
+
+    const body = groups[g].map((r, i) => [
+      String(g * 50 + i + 1),
+      new Date(r.time).toLocaleString(),
+      r.title,
+      r.detail,
+    ]);
+
+    doc.autoTable({
+      startY: 76,
+      head: [['#', 'Deleted At', 'Title', 'Detail']],
+      body,
+      styles: { fontSize: 9, cellPadding: 6 },
+      headStyles: { fillColor: [37, 99, 235] },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 150 },
+        2: { cellWidth: 170 },
+        3: { cellWidth: 'auto' },
+      },
+      didDrawPage: () => {
+        const pageSize = doc.internal.pageSize;
+        const pageHeight = pageSize.getHeight();
+        doc.setFontSize(9);
+        doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageSize.getWidth() - 80, pageHeight - 16);
+      }
+    });
+
+    const filename = `deleted-orders-batch-${String(g + 1).padStart(2, '0')}.pdf`;
+    doc.save(filename);
+  };
+
   const downloadAll = async () => {
     if (!deleted.length) return;
     setBusy(true);
     try {
       for (let g = 0; g < groups.length; g++) {
-        const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'A4' });
-        const title = `Deleted Orders Report — Batch ${g + 1} of ${groups.length}`;
-        doc.setFontSize(14);
-        doc.text(title, 40, 40);
-        doc.setFontSize(10);
-        doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 58);
-
-        const body = groups[g].map((r, i) => [
-          String(g * 50 + i + 1),
-          new Date(r.time).toLocaleString(),
-          r.title,
-          r.detail,
-        ]);
-
-        doc.autoTable({
-          startY: 76,
-          head: [['#', 'Deleted At', 'Title', 'Detail']],
-          body,
-          styles: { fontSize: 9, cellPadding: 6 },
-          headStyles: { fillColor: [37, 99, 235] },
-          columnStyles: {
-            0: { cellWidth: 30 },
-            1: { cellWidth: 150 },
-            2: { cellWidth: 170 },
-            3: { cellWidth: 'auto' },
-          },
-          didDrawPage: (data) => {
-            const pageSize = doc.internal.pageSize;
-            const pageHeight = pageSize.getHeight();
-            doc.setFontSize(9);
-            doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageSize.getWidth() - 80, pageHeight - 16);
-          }
-        });
-
-        const filename = `deleted-orders-batch-${String(g + 1).padStart(2, '0')}.pdf`;
-        doc.save(filename);
+        await downloadBatch(g);
         // small delay to allow downloads to queue
         // eslint-disable-next-line no-await-in-loop
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 200));
       }
     } finally {
       setBusy(false);
@@ -89,6 +93,14 @@ export default function DeletedOrdersReport() {
       {!deleted.length ? (
         <div className="muted">No deletions recorded yet.</div>
       ) : (
+        <div style={{ margin: '8px 0 12px', display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {groups.map((_, i) => (
+            <button key={i} className="action-btn" onClick={() => downloadBatch(i)}>Download batch {i + 1}</button>
+          ))}
+        </div>
+      )}
+
+      {!deleted.length ? null : (
         <div style={{ maxHeight: 280, overflow: 'auto', borderTop: '1px solid #f1f5f9', marginTop: 8 }}>
           <table className="table" style={{ width: '100%', fontSize: 13 }}>
             <thead>
