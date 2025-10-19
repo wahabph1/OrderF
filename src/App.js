@@ -38,7 +38,7 @@ function App() {
     // No persistent authentication - always require login after refresh
     // Reset to dashboard if trying to access protected views without authentication
     useEffect(() => {
-        const PROTECTED_VIEWS = ['wahabOrders'];
+        const PROTECTED_VIEWS = ['wahabOrders', 'profile'];
         if (PROTECTED_VIEWS.includes(currentView) && !wahabAuthenticated) {
             setCurrentView('dashboard');
         }
@@ -46,14 +46,14 @@ function App() {
     
     // Function jo view change karega
     const handleNavClick = (view) => {
-        const PROTECTED_VIEWS = ['wahabOrders'];
+        const PROTECTED_VIEWS = ['wahabOrders', 'profile'];
         if (PROTECTED_VIEWS.includes(view)) {
             if (wahabAuthenticated) {
                 setCurrentView(view);
                 startTransition();
             } else {
                 setProtectedTarget(view);
-              setShowWahabLogin(true);
+                setShowWahabLogin(true);
             }
         } else {
             setCurrentView(view);
