@@ -3,7 +3,6 @@
 import './App.css'; 
 import React, { useState, useEffect } from 'react'; // <--- useState aur useEffect import kiya
 import OrderTable from '../src/OrderTable'; 
-import Footer from '../src/Footer'; 
 import Navbar from '../src/Navbar';
 import SplashScreen from '../src/SplashScreen';
 import OrderForm from '../src/OrderForm';
@@ -93,8 +92,6 @@ function App() {
                 )}
             </main>
             
-            {/* 3. Footer */}
-            <Footer />
             
             {/* Wahab Authentication Modal */}
             {showWahabLogin && (
