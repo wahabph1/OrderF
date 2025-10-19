@@ -149,6 +149,8 @@ export default function InvoiceGenerator() {
             <div style={{ display:'grid', gridTemplateColumns:'1fr auto', rowGap:6 }}>
               <div style={{ color:'#64748b' }}>Subtotal</div>
               <div style={{ fontWeight:600 }}>AED {currency(totals.subtotal)}</div>
+              <div style={{ color:'#64748b' }}>Delivery</div>
+              <div style={{ fontWeight:600 }}>AED {currency(0)}</div>
               <div style={{ color:'#64748b' }}>Total</div>
               <div style={{ fontWeight:800, color:'#0ea5e9' }}>AED {currency(totals.total)}</div>
             </div>
