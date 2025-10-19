@@ -18,7 +18,6 @@
   padding: 16px;
   min-height: calc(100vh - 80px);
   background: var(--bg);
-  overflow-x: hidden; /* prevent page-wide horizontal scroll */
 }
 
 /* Light theme modifier */
