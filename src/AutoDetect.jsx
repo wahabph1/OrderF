@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { logActivity } from './utils/activity';
 
@@ -6,6 +6,8 @@ const API_URL = 'https://order-b.vercel.app/api/orders';
 
 export default function AutoDetect() {
   const [imgSrc, setImgSrc] = useState('');
+  const imgRef = useRef(null);
+  const boxRef = useRef(null);
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -13,6 +15,34 @@ export default function AutoDetect() {
   const [form, setForm] = useState({ serialNumber: '', owner: '', orderDate: new Date().toISOString().slice(0,10) });
 
   const owners = useMemo(() => ['Ahsan', 'Emirate Essentials', 'Habibi Tools', 'Wahab'], []);
+
+  // selection state for crop
+  const [sel, setSel] = useState({ x: 0, y: 0, w: 0, h: 0, dragging: false });
+  const containerRef = useRef(null);
+
+  const startSel = (e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setSel({ x, y, w: 0, h: 0, dragging: true });
+  };
+  const moveSel = (e) => {
+    if (!sel.dragging || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x2 = e.clientX - rect.left;
+    const y2 = e.clientY - rect.top;
+    const x = Math.min(sel.x, x2);
+    const y = Math.min(sel.y, y2);
+    const w = Math.abs(x2 - sel.x);
+    const h = Math.abs(y2 - sel.y);
+    setSel((s)=>({ ...s, x, y, w, h }));
+  };
+  const endSel = () => {
+    if (!sel.dragging) return;
+    setSel((s)=>({ ...s, dragging: false }));
+  };
+  const clearSel = () => setSel({ x:0, y:0, w:0, h:0, dragging:false });
 
   const onFile = (e) => {
     const f = e.target.files?.[0];
@@ -119,6 +149,28 @@ export default function AutoDetect() {
     } finally { setBusy(false); }
   };
 
+  const cropCanvasFromSelection = () => {
+    if (!imgRef.current || !containerRef.current || sel.w < 5 || sel.h < 5) return null;
+    const img = imgRef.current;
+    // compute scale from displayed size to natural
+    const dispW = img.clientWidth;
+    const dispH = img.clientHeight;
+    const natW = img.naturalWidth;
+    const natH = img.naturalHeight;
+    const scaleX = natW / dispW;
+    const scaleY = natH / dispH;
+    // selection relative to image box (image centered? ensure container fits image size only)
+    const sx = Math.max(0, Math.floor(sel.x * scaleX));
+    const sy = Math.max(0, Math.floor(sel.y * scaleY));
+    const sw = Math.min(natW - sx, Math.floor(sel.w * scaleX));
+    const sh = Math.min(natH - sy, Math.floor(sel.h * scaleY));
+    const canvas = document.createElement('canvas');
+    canvas.width = sw; canvas.height = sh;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    return canvas.toDataURL('image/png');
+  };
+
   const runDeepOCR = async () => {
     if (!imgSrc) return;
     setBusy(true); setErr('');
@@ -196,10 +248,20 @@ export default function AutoDetect() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
         <div>
           {imgSrc ? (
-            <img src={imgSrc} alt="preview" style={{ width:'100%', maxHeight:320, objectFit:'contain', border:'1px solid #e5e7eb', borderRadius:8 }} />
+            <div ref={containerRef} style={{ position:'relative', border:'1px solid #e5e7eb', borderRadius:8, overflow:'hidden' }}
+                 onMouseDown={startSel} onMouseMove={moveSel} onMouseUp={endSel}>
+              <img ref={imgRef} src={imgSrc} alt="preview" style={{ width:'100%', maxHeight:360, objectFit:'contain', display:'block' }} />
+              {(sel.w>2 && sel.h>2) && (
+                <div ref={boxRef} style={{ position:'absolute', left: sel.x, top: sel.y, width: sel.w, height: sel.h, border:'2px solid #2563eb', background:'rgba(37,99,235,0.15)' }} />
+              )}
+            </div>
           ) : (
-            <div style={{ border:'1px dashed #cbd5e1', borderRadius:8, padding:20, color:'#64748b' }}>Select an invoice image to start OCR.</div>
+            <div style={{ border:'1px dashed #cbd5e1', borderRadius:8, padding:20, color:'#64748b' }}>Select an invoice image to start OCR. Tip: drag to select the S.NO area for best results.</div>
           )}
+          <div style={{ display:'flex', gap:8, marginTop:8, flexWrap:'wrap' }}>
+            <button className="btn" onClick={() => { const c = cropCanvasFromSelection(); if (!c) { setErr('Select an area first'); return; } setBusy(true); setTimeout(async()=>{ try { const processed = await preprocessImage(c, 0); const d = await recognizeOnce(processed, '7'); const raw=(d?.text||'').replace(/\uFFFD/g,''); if(raw) setText(raw); const serial=pickSerial(raw); setForm(prev=>({ ...prev, serialNumber: serial||prev.serialNumber })); } catch(e){ setErr('Crop OCR failed'); } finally{ setBusy(false);} },0); }} disabled={!imgSrc || busy}>OCR Crop (Serial)</button>
+            <button className="btn" onClick={clearSel} disabled={!imgSrc || busy}>Clear Selection</button>
+          </div>
           {busy && <div style={{ marginTop:8, color:'#475569' }}>Detecting text…</div>}
           {text && (
             <div style={{ marginTop:8 }}>
