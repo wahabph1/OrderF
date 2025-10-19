@@ -937,7 +937,7 @@ background: linear-gradient(90deg, #0ea5e9, #6366f1);
 .cta-btn:active { transform: translateY(1px); }
 
 .footer-top {
-  padding: 2.5rem 1rem;
+  padding: 1rem 1rem;
 }
 
 .footer-grid {
@@ -945,7 +945,7 @@ background: linear-gradient(90deg, #0ea5e9, #6366f1);
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .footer-brand .brand-row {
@@ -1057,7 +1057,7 @@ background: linear-gradient(90deg, #0ea5e9, #6366f1);
 /* Bottom bar */
 .footer-bottom {
   border-top: 1px solid #1f2937;
-  padding: 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .footer-bottom {
