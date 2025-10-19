@@ -1,5 +1,6 @@
 import React from 'react';
 import DeletedOrdersReport from './components/DeletedOrdersReport';
+import InvoiceGenerator from './components/InvoiceGenerator';
 
 export default function Profile() {
   return (
@@ -19,6 +20,7 @@ export default function Profile() {
 
       <div className="profile-grid" style={{ display: 'grid', gap: 16 }}>
         <DeletedOrdersReport />
+        <InvoiceGenerator />
       </div>
     </div>
   );
