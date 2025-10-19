@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 function chunk(arr, size) {
   const out = [];
@@ -10,6 +10,23 @@ function chunk(arr, size) {
 }
 
 const API_URL = 'https://order-b.vercel.app/api/orders';
+
+function safeSavePDF(doc, filename) {
+  try {
+    // Primary path
+    doc.save(filename);
+  } catch (e) {
+    try {
+      // Fallback: manual anchor download
+      const blob = doc.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.style.display = 'none';
+      document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 0);
+    } catch {}
+  }
+}
 
 export default function DeletedOrdersReport() {
   const [busy, setBusy] = useState(false);
@@ -55,7 +72,7 @@ export default function DeletedOrdersReport() {
       r.owner,
     ]);
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 76,
       head: [['#', 'Deleted At', 'Serial/ID', 'Owner']],
       body,
@@ -76,7 +93,7 @@ export default function DeletedOrdersReport() {
     });
 
     const filename = `deleted-orders-batch-${String(g + 1).padStart(2, '0')}.pdf`;
-    doc.save(filename);
+    safeSavePDF(doc, filename);
   };
 
   const downloadFirst5 = () => {
@@ -96,7 +113,7 @@ export default function DeletedOrdersReport() {
       r.owner,
     ]);
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 76,
       head: [['#', 'Deleted At', 'Serial/ID', 'Owner']],
       body,
@@ -110,7 +127,7 @@ export default function DeletedOrdersReport() {
       },
     });
 
-    doc.save('deleted-orders-first-5.pdf');
+    safeSavePDF(doc, 'deleted-orders-first-5.pdf');
   };
 
   const downloadAll = async () => {
