@@ -99,6 +99,16 @@ function Navbar({ onNavClick, currentView }) {
 
           <button
             type="button"
+            className={currentView === 'autoDetect' ? 'nav-link active' : 'nav-link'}
+            onClick={() => handleNavClick('autoDetect')}
+            title="Upload invoice and auto-detect serial"
+          >
+            <span className="nav-shine" aria-hidden></span>
+            Auto Detect
+          </button>
+
+          <button
+            type="button"
             className={currentView === 'profile' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('profile')}
           >

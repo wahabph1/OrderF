@@ -12,6 +12,7 @@ import WahabLogin from '../src/WahabLogin'; // Wahab authentication
 import ProfitCalculator from '../src/ProfitCalculator'; // Profit Calculator
 import Dashboard from './Dashboard';
 import LoadingPopup from './components/LoadingPopup';
+import AutoDetect from '../src/AutoDetect';
 
 function App() {
     // Splash screen state
@@ -108,6 +109,8 @@ function App() {
                     <WahabOrderTable />
                 ) : currentView === 'profitCalculator' ? (
                     <ProfitCalculator />
+                ) : currentView === 'autoDetect' ? (
+                    <AutoDetect />
                 ) : (
                     <OrderForm onOrderAdded={() => {}} />
                 )}
