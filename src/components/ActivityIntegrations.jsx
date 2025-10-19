@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { readActivity, clearActivity, logActivity } from '../utils/activity';
 import './ActivityIntegrations.css';

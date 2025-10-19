@@ -12,11 +12,13 @@ function DonutChart({ segments, size = 240, strokeWidth = 36 }) {
     const total = segments.reduce((s, x) => s + x.value, 0);
     const [reveal, setReveal] = useState(false);
 
+    const segmentsKey = React.useMemo(() => segments.map(s => `${s.label}:${s.value}:${s.color}`).join('|'), [segments]);
+
     useEffect(() => {
         // trigger animation on mount/update
         const t = setTimeout(() => setReveal(true), 30);
         return () => clearTimeout(t);
-    }, [total, JSON.stringify(segments)]);
+    }, [total, segmentsKey]);
 
     let acc = 0; // cumulative offset
 
@@ -76,7 +78,6 @@ function StatCard({ label, value, color }) {
 }
 
 function WahabReports({ onClose }) {
-    const [orders, setOrders] = useState([]);
     const [counts, setCounts] = useState({ pending: 0, inTransit: 0, delivered: 0, cancelled: 0, total: 0 });
 
     useEffect(() => {
@@ -85,10 +86,8 @@ function WahabReports({ onClose }) {
                 // Fetch only Wahab orders
                 const res = await axios.get(`${API_URL}?owner=Wahab`);
                 const data = Array.isArray(res.data) ? res.data : [];
-                setOrders(data);
                 computeCounts(data);
             } catch (e) {
-                setOrders([]);
                 setCounts({ pending: 0, inTransit: 0, delivered: 0, cancelled: 0, total: 0 });
             }
         };

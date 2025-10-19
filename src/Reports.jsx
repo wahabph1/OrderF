@@ -12,11 +12,13 @@ function DonutChart({ segments, size = 240, strokeWidth = 36 }) {
     const total = segments.reduce((s, x) => s + x.value, 0);
     const [reveal, setReveal] = useState(false);
 
+    const segmentsKey = React.useMemo(() => segments.map(s => `${s.label}:${s.value}:${s.color}`).join('|'), [segments]);
+
     useEffect(() => {
         // trigger animation on mount/update
         const t = setTimeout(() => setReveal(true), 30);
         return () => clearTimeout(t);
-    }, [total, JSON.stringify(segments)]);
+    }, [total, segmentsKey]);
 
     let acc = 0; // cumulative offset
 
@@ -121,40 +123,6 @@ function Reports() {
         cancelled: '#ef4444'    // red
     };
 
-    const toPercent = (n) => counts.total > 0 ? (n / counts.total) * 100 : 0;
-
-    const perc = {
-        pending: toPercent(counts.pending),
-        inTransit: toPercent(counts.inTransit),
-        delivered: toPercent(counts.delivered),
-        cancelled: toPercent(counts.cancelled)
-    };
-
-    const stops = (() => {
-        const p1 = perc.pending;
-        const p2 = p1 + perc.inTransit;
-        const p3 = p2 + perc.delivered;
-        return [
-            `${colors.pending} 0 ${p1}%`,
-            `${colors.inTransit} ${p1}% ${p2}%`,
-            `${colors.delivered} ${p2}% ${p3}%`,
-            `${colors.cancelled} ${p3}% 100%`
-        ].join(', ');
-    })();
-
-    const chartStyle = counts.total > 0
-        ? { width: 220, height: 220, borderRadius: '50%', background: `conic-gradient(${stops})`, position: 'relative' }
-        : { width: 220, height: 220, borderRadius: '50%', background: '#e5e7eb', position: 'relative' };
-
-    const holeStyle = { position: 'absolute', inset: 0, margin: 'auto', width: 120, height: 120, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' };
-
-    const legendItem = (label, value, color) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} key={label}>
-            <span style={{ width: 12, height: 12, background: color, borderRadius: 3, display: 'inline-block' }} />
-            <span style={{ minWidth: 90 }}>{label}</span>
-            <strong>{value}</strong>
-        </div>
-    );
 
     const segments = [
         { label: 'Pending', value: counts.pending, color: colors.pending },

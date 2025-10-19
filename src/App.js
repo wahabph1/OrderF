@@ -2,7 +2,6 @@
 
 import './App.css'; 
 import React, { useState, useEffect, useRef } from 'react'; // <--- useState, useEffect, useRef import kiya
-import OrderTable from '../src/OrderTable'; 
 import Navbar from '../src/Navbar';
 import SplashScreen from '../src/SplashScreen';
 import OrderForm from '../src/OrderForm';
