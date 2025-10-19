@@ -15,8 +15,8 @@ export default function InvoiceGenerator() {
     billTo: 'Customer Name',
     billAddress: 'Address line, City, Country',
     phone: '+971-50-000-0000',
-    taxRate: 5,
     warranty: '', // optional
+    delivery: 'Free Delivery',
     note: 'Thank you for your business!',
   });
   const [logo, setLogo] = useState('');
@@ -33,10 +33,9 @@ export default function InvoiceGenerator() {
 
   const totals = useMemo(() => {
     const subtotal = filteredItems.reduce((s, it) => s + (Number(it.qty)||0) * (Number(it.price)||0), 0);
-    const tax = subtotal * (Number(form.taxRate||0) / 100);
-    const total = subtotal + tax;
-    return { subtotal, tax, total };
-  }, [filteredItems, form.taxRate]);
+    const total = subtotal; // no tax
+    return { subtotal, total };
+  }, [filteredItems]);
 
   const setItem = (i, patch) => setItems(prev => prev.map((it, idx) => idx === i ? { ...it, ...patch } : it));
   const addItem = () => setItems(prev => [...prev, { desc: '', qty: 1, price: 0 }]);
@@ -93,7 +92,6 @@ export default function InvoiceGenerator() {
         <div className="input-group"><label>Bill Address</label><input value={form.billAddress} onChange={e=>setForm({ ...form, billAddress: e.target.value })} /></div>
         <div className="input-group"><label>Phone</label><input value={form.phone} onChange={e=>setForm({ ...form, phone: e.target.value })} /></div>
         <div className="input-group"><label>Warranty (optional)</label><input placeholder="e.g. 12 months replacement" value={form.warranty} onChange={e=>setForm({ ...form, warranty: e.target.value })} /></div>
-        <div className="input-group"><label>Tax %</label><input type="number" min="0" step="0.1" value={form.taxRate} onChange={e=>setForm({ ...form, taxRate: e.target.value })} /></div>
       </div>
 
       {/* Items */}
@@ -151,8 +149,6 @@ export default function InvoiceGenerator() {
             <div style={{ display:'grid', gridTemplateColumns:'1fr auto', rowGap:6 }}>
               <div style={{ color:'#64748b' }}>Subtotal</div>
               <div style={{ fontWeight:600 }}>AED {currency(totals.subtotal)}</div>
-              <div style={{ color:'#64748b' }}>Tax ({form.taxRate}%)</div>
-              <div style={{ fontWeight:600 }}>AED {currency(totals.tax)}</div>
               <div style={{ color:'#64748b' }}>Total</div>
               <div style={{ fontWeight:800, color:'#0ea5e9' }}>AED {currency(totals.total)}</div>
             </div>
@@ -186,7 +182,10 @@ export default function InvoiceGenerator() {
         {/* Footer */}
         <div style={{ padding:20, background:'#f8fafc', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap' }}>
           <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
-            <div style={{ color:'#64748b' }}>{form.note}</div>
+            <div style={{ color:'#64748b' }}>Thank you for shopping with {form.company}!</div>
+            <span style={{ background:'#e0f2fe', color:'#075985', border:'1px solid #0284c7', padding:'6px 10px', borderRadius:6, fontWeight:600 }}>
+              Delivery: {form.delivery}
+            </span>
             {String(form.warranty || '').trim() !== '' && (
               <span style={{ background:'#dcfce7', color:'#166534', border:'1px solid #16a34a', padding:'6px 10px', borderRadius:6, fontWeight:600 }}>
                 Warranty: {form.warranty}
