@@ -23,6 +23,7 @@ function App() {
     // Wahab authentication states
     const [showWahabLogin, setShowWahabLogin] = useState(false);
     const [wahabAuthenticated, setWahabAuthenticated] = useState(false);
+    const [protectedTarget, setProtectedTarget] = useState(null);
 
     // Global page transition overlay
     const [transitioning, setTransitioning] = useState(false);
@@ -35,23 +36,24 @@ function App() {
     };
     
     // No persistent authentication - always require login after refresh
-    // Reset to dashboard if trying to access wahabOrders without authentication
+    // Reset to dashboard if trying to access protected views without authentication
     useEffect(() => {
-        if (currentView === 'wahabOrders' && !wahabAuthenticated) {
+        const PROTECTED_VIEWS = ['wahabOrders'];
+        if (PROTECTED_VIEWS.includes(currentView) && !wahabAuthenticated) {
             setCurrentView('dashboard');
         }
     }, [currentView, wahabAuthenticated]);
     
     // Function jo view change karega
     const handleNavClick = (view) => {
-        // Check if trying to access Wahab Orders
-        if (view === 'wahabOrders') {
-            // Always require authentication for Wahab Orders
+        const PROTECTED_VIEWS = ['wahabOrders'];
+        if (PROTECTED_VIEWS.includes(view)) {
             if (wahabAuthenticated) {
                 setCurrentView(view);
                 startTransition();
             } else {
-                setShowWahabLogin(true);
+                setProtectedTarget(view);
+              setShowWahabLogin(true);
             }
         } else {
             setCurrentView(view);
@@ -62,7 +64,8 @@ function App() {
     // Handle successful Wahab login
     const handleWahabLoginSuccess = () => {
         setWahabAuthenticated(true);
-        setCurrentView('wahabOrders');
+        setCurrentView(protectedTarget || 'wahabOrders');
+        setProtectedTarget(null);
         setShowWahabLogin(false);
         startTransition();
     };
