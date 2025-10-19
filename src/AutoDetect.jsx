@@ -97,18 +97,45 @@ export default function AutoDetect() {
     return '';
   };
 
-  const runOCR = async () => {
+  const runQuickOCR = async () => {
     if (!imgSrc) return;
-    setBusy(true); setErr(''); setText('');
+    setBusy(true); setErr(''); // keep previous text for reference
+    try {
+      const processed = await preprocessImage(imgSrc, 0); // 0° only
+      const d = await recognizeOnce(processed, '7'); // single-line-ish
+      const raw = (d?.text || '').replace(/\uFFFD/g, '');
+      if (raw) setText(raw);
+      const serial = pickSerial(raw);
+      const dateMatch = raw.match(/(\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2})|(\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})/);
+      const ownerFound = owners.find(o => new RegExp(o, 'i').test(raw)) || '';
+      setForm(prev => ({
+        ...prev,
+        serialNumber: serial || prev.serialNumber,
+        orderDate: dateMatch ? normalizeDate(dateMatch[0]) : prev.orderDate,
+        owner: ownerFound || prev.owner
+      }));
+    } catch (e) {
+      setErr('Quick scan failed. Try deep scan.');
+    } finally { setBusy(false); }
+  };
+
+  const runDeepOCR = async () => {
+    if (!imgSrc) return;
+    setBusy(true); setErr('');
+    const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms));
     try {
       const angles = [0, 90, 180, 270];
       let best = { score: -1, text: '', serial: '', date: '', owner: '' };
       for (const angle of angles) {
         const processed = await preprocessImage(imgSrc, angle);
-        const d1 = await recognizeOnce(processed, '6');
-        const d2 = await recognizeOnce(processed, '7');
-        const candidates = [d1, d2];
-        for (const d of candidates) {
+        const p1 = recognizeOnce(processed, '6');
+        const p2 = recognizeOnce(processed, '7');
+        const results = await Promise.race([
+          Promise.all([p1, p2]),
+          timeout(8000) // 8s safety
+        ]);
+        if (!Array.isArray(results)) break; // timed out
+        for (const d of results) {
           const raw = (d?.text || '').replace(/\uFFFD/g, '');
           const serial = pickSerial(raw);
           const dateMatch = raw.match(/(\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2})|(\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})/);
@@ -117,7 +144,7 @@ export default function AutoDetect() {
           if (score > best.score) best = { score, text: raw, serial, date: dateMatch ? dateMatch[0] : '', owner: ownerFound };
         }
       }
-      setText(best.text);
+      if (best.text) setText(best.text);
       setForm(prev => ({
         ...prev,
         serialNumber: best.serial || prev.serialNumber,
@@ -125,10 +152,8 @@ export default function AutoDetect() {
         owner: best.owner || prev.owner
       }));
     } catch (e) {
-      setErr('OCR failed. Try a clearer image.');
-    } finally {
-      setBusy(false);
-    }
+      setErr('Deep scan timed out or failed. You can edit fields manually.');
+    } finally { setBusy(false); }
   };
 
   const normalizeDate = (s) => {
@@ -154,7 +179,7 @@ export default function AutoDetect() {
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { if (imgSrc) runOCR(); /* auto run on select */ }, [imgSrc]);
+  useEffect(() => { if (imgSrc) runQuickOCR(); /* quick auto */ }, [imgSrc]);
 
   return (
     <div className="profile-card" style={{ padding: 16 }}>
@@ -192,8 +217,9 @@ export default function AutoDetect() {
             </select>
           </div>
           <div className="input-group"><label>Date</label><input type="date" value={form.orderDate} onChange={e=>setForm({ ...form, orderDate: e.target.value })} /></div>
-          <div style={{ display:'flex', gap:8, marginTop:12 }}>
-            <button className="btn" onClick={runOCR} disabled={!imgSrc || busy}>Re-run Detect</button>
+          <div style={{ display:'flex', gap:8, marginTop:12, flexWrap:'wrap' }}>
+            <button className="btn" onClick={runQuickOCR} disabled={!imgSrc || busy} title="Fast (0°)">Quick Scan</button>
+            <button className="btn" onClick={runDeepOCR} disabled={!imgSrc || busy} title="Try rotated & multi-pass (slow)">Deep Scan (slow)</button>
             <button className="btn" onClick={createOrder} disabled={busy} style={{ background:'#16a34a', color:'#fff', border:'1px solid #15803d' }}>Create Order</button>
           </div>
         </div>
