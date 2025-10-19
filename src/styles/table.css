@@ -1,3 +1,31 @@
+/* Enhanced profile-like table spacing for dashboard orders */
+.table--profile {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+.table--profile thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #f1f5f9;
+  color: #0f172a;
+  border-bottom: 1px solid #e5e7eb;
+}
+.table--profile tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.table--profile tbody tr:hover {
+  background: #fafafa;
+}
+/* Keep responsiveness container tidy */
+.table-responsive {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
 :root {
   --surface: #ffffff;
   --surface-2: #f8fafc;

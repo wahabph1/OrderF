@@ -354,7 +354,7 @@ function OrderTable() {
                 <div style={{ padding: 16, textAlign: 'center' }}>No orders found for the current selection.</div>
               ) : (
                 <div className="table-responsive">
-                  <table className="table">
+                  <table className="table table--profile">
                     <thead>
                       <tr>
                         <th>Serial No.</th>
