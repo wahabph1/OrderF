@@ -7,6 +7,8 @@ import ConfirmDialog from './components/ConfirmDialog';
 import Modal from './components/Modal';
 import LoadingPopup from './components/LoadingPopup';
 import { logActivity } from './utils/activity';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const API_URL = 'https://order-b.vercel.app/api/orders';
 // Removed 'All' option and excluded Wahab from main dashboard
@@ -139,6 +141,61 @@ function OrderTable() {
 
     const statusClass = (s) => `status status--${String(s || '').toLowerCase().replace(/\s+/g,'-')}`;
 
+    const safeSavePDF = (doc, filename) => {
+        try {
+            doc.save(filename);
+        } catch (e) {
+            try {
+                const blob = doc.output('blob');
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = filename; a.style.display = 'none';
+                document.body.appendChild(a); a.click();
+                setTimeout(() => { URL.revokeObjectURL(url); document.body.removeChild(a); }, 0);
+            } catch {}
+        }
+    };
+
+    const exportByStatus = (status) => {
+        const list = (orders || []).filter(o => String(o.deliveryStatus).toLowerCase() === String(status).toLowerCase());
+        if (!list.length) { alert(`No ${status} orders to export.`); return; }
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'A4' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(14);
+        doc.text(`Orders Report — ${status}`, 40, 40);
+        doc.setFontSize(10);
+        doc.text(`Generated: ${new Date().toLocaleString()}  •  Total: ${list.length}`, 40, 58);
+        const body = list.map((o, i) => [
+            String(i + 1),
+            o.serialNumber || '-',
+            new Date(o.orderDate || o.createdAt).toLocaleDateString(),
+            o.owner || '-',
+            o.deliveryStatus || '-',
+        ]);
+        autoTable(doc, {
+            startY: 76,
+            head: [['#', 'Serial', 'Date', 'Owner', 'Status']],
+            body,
+            styles: { fontSize: 9, cellPadding: 6 },
+            headStyles: { fillColor: [37, 99, 235] },
+            columnStyles: {
+                0: { cellWidth: 30 },
+                1: { cellWidth: 140 },
+                2: { cellWidth: 90 },
+                3: { cellWidth: 140 },
+                4: { cellWidth: 'auto' },
+            },
+            didDrawPage: () => {
+                const pageSize = doc.internal.pageSize;
+                const pageHeight = pageSize.getHeight();
+                doc.setFontSize(9);
+                doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageSize.getWidth() - 80, pageHeight - 16);
+            }
+        });
+        const fname = `orders-${status.toLowerCase().replace(/\s+/g,'-')}.pdf`;
+        safeSavePDF(doc, fname);
+    };
+
     // Show animated popup instead of inline loading text
     if (error) return <p style={{color:'red', textAlign:'center'}}>{error}</p>;
 
@@ -226,7 +283,12 @@ function OrderTable() {
                     ))}
                   </select>
                   <button className="btn" onClick={handleRefresh}>Refresh</button>
-<button 
+                  <div style={{ display:'flex', gap: 8, flexWrap:'wrap' }}>
+                    <button type="button" className="btn" onClick={() => exportByStatus('Pending')} style={{ background:'#e5e7eb', color:'#111827', border:'1px solid #d1d5db' }}>Export Pending</button>
+                    <button type="button" className="btn" onClick={() => exportByStatus('Delivered')} style={{ background:'#22c55e', color:'#fff', border:'1px solid #16a34a' }}>Export Delivered</button>
+                    <button type="button" className="btn" onClick={() => exportByStatus('Cancelled')} style={{ background:'#ef4444', color:'#fff', border:'1px solid #dc2626' }}>Export Cancelled</button>
+                  </div>
+                  <button 
                     className="btn btn-delete-all" 
                     onClick={handleDeleteAllOrders}
                     style={{
