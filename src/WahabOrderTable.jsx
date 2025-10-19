@@ -119,7 +119,7 @@ function WahabOrderTable() {
     return (
         <div className="container">
             {/* Add Wahab Order Button */}
-            <div style={{ marginBottom: '16px', textAlign: 'right' }}>
+            <div style={{ marginBottom: '16px', marginTop: '16px', textAlign: 'right' }}>
                 <button
                     onClick={() => setShowAddModal(true)}
                     className="add-order-btn"
