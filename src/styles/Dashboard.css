@@ -97,29 +97,153 @@
 .owner-legend .ol-item.t { color: #1e3a8a; }
 .owner-legend .ol-item.c { color: #991b1b; }
 
-/* Responsive: stack on smaller screens */
+/* Tablet responsiveness */
 @media (max-width: 1024px) {
   .dash-shell {
     grid-template-columns: 1fr;
+    gap: 12px;
     padding: 12px;
   }
-  .dash-sidebar { position: static; }
+  .dash-sidebar {
+    position: static;
+    order: 2; /* Move sidebar below content on tablets */
+  }
+  .dash-content {
+    order: 1;
+  }
 }
 
-/* Mobile tweaks: cap analysis height and compact cards */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-  .dash-sidebar {
-    max-height: calc(100vh - 64px - 12px); /* below sticky navbar/menu */
-    overflow: auto;
-    padding: 10px;
+  .dash-shell {
+    padding: 8px;
+    gap: 8px;
+    min-height: auto;
   }
-  .analysis-grid { grid-template-columns: 1fr 1fr; }
-  .analysis-card { padding: 10px 12px; }
-  .ac-value { font-size: 18px; }
-  .owners-wrap { margin-top: 10px; }
+  
+  .dash-sidebar {
+    padding: 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+  }
+  
+  .analysis-title {
+    font-size: 18px;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .analysis-card {
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+  
+  .ac-value {
+    font-size: 16px;
+  }
+  
+  .ac-label {
+    font-size: 10px;
+  }
+  
+  .owners-wrap {
+    margin-top: 12px;
+  }
+  
+  .owners-title {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
   .owners-list {
-    max-height: 220px; /* limit owner rows length */
-    overflow: auto;
+    max-height: 200px;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+  }
+  
+  .owner-chip {
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+  
+  .owner-name {
+    font-size: 14px;
+  }
+  
+  .owner-count {
+    font-size: 11px;
+    padding: 1px 6px;
+  }
+  
+  .owner-legend {
+    font-size: 11px;
+    gap: 6px;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+  .dash-shell {
+    padding: 4px;
+    gap: 4px;
+  }
+  
+  .dash-sidebar {
+    padding: 8px;
+  }
+  
+  .analysis-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .analysis-card {
+    padding: 8px;
+  }
+  
+  .ac-head {
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  
+  .ac-icon {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .ac-label {
+    font-size: 9px;
+  }
+  
+  .ac-value {
+    font-size: 14px;
+  }
+  
+  .owners-list {
+    max-height: 150px;
+  }
+  
+  .owner-chip {
+    padding: 8px 10px;
+  }
+  
+  .owner-name {
+    font-size: 13px;
+  }
+  
+  .owner-count {
+    font-size: 10px;
+  }
+  
+  .owner-legend {
+    font-size: 10px;
+    gap: 4px;
+    flex-wrap: wrap;
   }
 }

@@ -1163,17 +1163,47 @@ background: linear-gradient(90deg, #0ea5e9, #6366f1);
 }
 
 @media (max-width: 768px) {
+    /* Header improvements for mobile */
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 1001;
+    }
+    
+    .navbar-container {
+        padding: 0.5rem 1rem;
+    }
+    
+    .brand-name {
+        font-size: 1rem;
+    }
+    
+    .nav-links {
+        top: 56px;
+    }
+    
+    /* Main content adjustments */
+    main {
+        padding: 1rem;
+    }
+    
+    main.is-dashboard {
+        padding: 0;
+    }
+    
     .filter-search-container {
         flex-direction: column;
         gap: 1rem;
+        padding: 0.75rem;
     }
 
     .order-table-view {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .dashboard-heading {
         font-size: 1.5rem;
+        margin: 1rem 0;
     }
 
     /* Stacked, card-style rows: no horizontal scroll, actions always visible */
