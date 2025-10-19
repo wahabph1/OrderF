@@ -23,21 +23,67 @@ export default function AutoDetect() {
     r.readAsDataURL(f);
   };
 
+  const preprocessImage = async (src) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 1600;
+        const scale = Math.min(1, maxW / img.width);
+        canvas.width = Math.floor(img.width * scale);
+        canvas.height = Math.floor(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        // grayscale + contrast + simple threshold
+        // emphasize red text: convert to grayscale using max channel
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i+1], b = data[i+2];
+          let v = Math.max(r, g, b); // max-channel grayscale
+          // increase contrast
+          v = (v - 128) * 1.2 + 128;
+          // threshold
+          const t = v > 150 ? 255 : 0;
+          data[i] = data[i+1] = data[i+2] = t;
+        }
+        ctx.putImageData(imageData, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.src = src;
+    });
+  };
+
   const runOCR = async () => {
     if (!imgSrc) return;
     setBusy(true); setErr(''); setText('');
     try {
+      const processed = await preprocessImage(imgSrc);
       const Tesseract = await import('tesseract.js');
-      const { data } = await Tesseract.recognize(imgSrc, 'eng', { logger: () => {} });
-      const t = data?.text || '';
+      const { data } = await Tesseract.recognize(processed, 'eng', { logger: () => {}, tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-', preserve_interword_spaces: '1' });
+      const t = (data?.text || '').replace(/\uFFFD/g, '');
       setText(t);
-      // simple parsing
-      const serialMatch = t.match(/(?:Serial|Invoice|Order)[\s#:]*([A-Z0-9-]{4,})/i) || t.match(/\b([A-Z]{1,3}-?\d{4,})\b/);
+      // Serial patterns: S.NO 67676, S/NO: 12345, S-No 123, Serial # ABC-1234
+      const serialRegexes = [
+        /S\s*\.?\s*NO\s*[:#-]?\s*([A-Z0-9-]{3,})/i,
+        /S\s*\/?\s*NO\s*[:#-]?\s*([A-Z0-9-]{3,})/i,
+        /Serial\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
+        /Invoice\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
+        /Order\s*(?:No\.?|#|:)\s*([A-Z0-9-]{3,})/i,
+        /\b([A-Z]{1,3}-?\d{4,})\b/,
+        /\b(\d{5,})\b/ // plain digits fallback
+      ];
+      let serial = '';
+      for (const rx of serialRegexes) {
+        const m = t.match(rx);
+        if (m) { serial = m[1] || m[0]; break; }
+      }
       const dateMatch = t.match(/(\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2})|(\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})/);
       const ownerFound = owners.find(o => new RegExp(o, 'i').test(t));
       setForm(prev => ({
         ...prev,
-        serialNumber: serialMatch ? serialMatch[1] || serialMatch[0] : prev.serialNumber,
+        serialNumber: serial || prev.serialNumber,
         orderDate: dateMatch ? normalizeDate(dateMatch[0]) : prev.orderDate,
         owner: ownerFound || prev.owner
       }));
