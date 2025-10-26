@@ -11,6 +11,7 @@ function ProfitCalculator() {
     const [formData, setFormData] = useState({
         itemName: '',
         realPrice: '',
+        weeklyAdSpend: '',
         deliveryCharges: '',
         deliveredOrders: ''
     });
@@ -104,6 +105,7 @@ function ProfitCalculator() {
         setFormData({
             itemName: '',
             realPrice: '',
+            weeklyAdSpend: '',
             deliveryCharges: '',
             deliveredOrders: ''
         });
@@ -117,29 +119,38 @@ function ProfitCalculator() {
     };
 
     const calculateProfit = async () => {
-        const { realPrice, deliveryCharges, deliveredOrders } = formData;
+        const { realPrice, weeklyAdSpend, deliveryCharges, deliveredOrders } = formData;
         
-        if (!realPrice || !deliveryCharges || !deliveredOrders) {
+        if (!realPrice || !weeklyAdSpend || !deliveryCharges || !deliveredOrders) {
             alert('Please fill all fields');
             return;
         }
 
         const realPriceNum = parseFloat(realPrice);
+        const weeklyAdSpendNum = parseFloat(weeklyAdSpend);
         const deliveryChargesNum = parseFloat(deliveryCharges);
         const deliveredOrdersNum = parseInt(deliveredOrders);
 
-        // Profit calculation: (Real Price + Delivery Charges) × Number of Delivered Orders
-        const totalProfit = (realPriceNum + deliveryChargesNum) * deliveredOrdersNum;
+        // Revenue calculation: (Real Price + Delivery Charges) × Number of Delivered Orders
+        const totalRevenue = (realPriceNum + deliveryChargesNum) * deliveredOrdersNum;
+        // Cost calculation: (Real Price × Number of Delivered Orders) + Weekly Ad Spend
+        const totalCost = (realPriceNum * deliveredOrdersNum) + weeklyAdSpendNum;
+        // Profit calculation: Total Revenue - Total Cost (Revenue - Real Price Cost - Ad Spend)
+        const totalProfit = (deliveryChargesNum * deliveredOrdersNum) - weeklyAdSpendNum;
+        const profitPerOrder = totalProfit / deliveredOrdersNum;
 
         const calculationResult = {
             storeId: selectedStore.id,
             itemName: formData.itemName,
             storeName: stores.find(s => s.id === selectedStore.id)?.name,
             realPrice: realPriceNum,
+            weeklyAdSpend: weeklyAdSpendNum,
             deliveryCharges: deliveryChargesNum,
             deliveredOrders: deliveredOrdersNum,
+            totalRevenue: totalRevenue,
+            totalCost: totalCost,
             totalProfit: totalProfit,
-            profitPerOrder: realPriceNum + deliveryChargesNum
+            profitPerOrder: profitPerOrder
         };
         
         // Save to database
@@ -156,6 +167,7 @@ function ProfitCalculator() {
         setFormData({
             itemName: '',
             realPrice: '',
+            weeklyAdSpend: '',
             deliveryCharges: '',
             deliveredOrders: ''
         });
@@ -702,6 +714,36 @@ function ProfitCalculator() {
                             />
                         </div>
 
+                        {/* Weekly Ad Spend */}
+                        <div>
+                            <label style={{
+                                display: 'block',
+                                marginBottom: '8px',
+                                fontWeight: '500',
+                                color: '#374151'
+                            }}>
+                                Weekly Ad Spend (AED)
+                            </label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={formData.weeklyAdSpend}
+                                onChange={(e) => handleInputChange('weeklyAdSpend', e.target.value)}
+                                placeholder="Enter total weekly ad spend in AED"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px 16px',
+                                    border: '2px solid #e5e7eb',
+                                    borderRadius: '8px',
+                                    fontSize: '16px',
+                                    outline: 'none',
+                                    boxSizing: 'border-box'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = selectedStore.color}
+                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                            />
+                        </div>
+
                         {/* Delivery Charges */}
                         <div>
                             <label style={{
@@ -877,6 +919,21 @@ function ProfitCalculator() {
                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                         }}>
                             <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
+                                WEEKLY AD SPEND
+                            </div>
+                            <div style={{ fontSize: '24px', fontWeight: '700', color: selectedStore.color }}>
+                                {result.weeklyAdSpend.toFixed(2)} AED
+                            </div>
+                        </div>
+
+                        <div style={{
+                            background: 'white',
+                            padding: '20px',
+                            borderRadius: '12px',
+                            textAlign: 'center',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }}>
+                            <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
                                 DELIVERY CHARGES
                             </div>
                             <div style={{ fontSize: '24px', fontWeight: '700', color: selectedStore.color }}>
@@ -915,6 +972,50 @@ function ProfitCalculator() {
                         </div>
                     </div>
 
+                    {/* Revenue and Cost Summary */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                        gap: '20px',
+                        marginBottom: '30px'
+                    }}>
+                        <div style={{
+                            background: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+                            color: 'white',
+                            padding: '24px',
+                            borderRadius: '12px',
+                            textAlign: 'center'
+                        }}>
+                            <div style={{ fontSize: '16px', opacity: 0.9, marginBottom: '8px' }}>
+                                TOTAL REVENUE
+                            </div>
+                            <div style={{ fontSize: '32px', fontWeight: '700' }}>
+                                {result.totalRevenue.toFixed(2)} AED
+                            </div>
+                            <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>
+                                ({result.realPrice.toFixed(2)} + {result.deliveryCharges.toFixed(2)}) × {result.deliveredOrders}
+                            </div>
+                        </div>
+                        
+                        <div style={{
+                            background: 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)',
+                            color: 'white',
+                            padding: '24px',
+                            borderRadius: '12px',
+                            textAlign: 'center'
+                        }}>
+                            <div style={{ fontSize: '16px', opacity: 0.9, marginBottom: '8px' }}>
+                                TOTAL COST
+                            </div>
+                            <div style={{ fontSize: '32px', fontWeight: '700' }}>
+                                {result.totalCost.toFixed(2)} AED
+                            </div>
+                            <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>
+                                ({result.realPrice.toFixed(2)} × {result.deliveredOrders}) + {result.weeklyAdSpend.toFixed(2)}
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Total Profit Highlight */}
                     <div style={{
                         background: `linear-gradient(135deg, ${selectedStore.color} 0%, ${selectedStore.color}dd 100%)`,
@@ -931,7 +1032,7 @@ function ProfitCalculator() {
                             {result.totalProfit.toFixed(2)} AED
                         </div>
                         <div style={{ fontSize: '16px', opacity: 0.8, marginTop: '8px' }}>
-                            ({result.profitPerOrder.toFixed(2)} AED × {result.deliveredOrders} orders)
+                            Revenue - Cost = Profit ({result.profitPerOrder.toFixed(2)} AED per order)
                         </div>
                     </div>
 
@@ -947,6 +1048,7 @@ function ProfitCalculator() {
                                 setFormData({
                                     itemName: '',
                                     realPrice: '',
+                                    weeklyAdSpend: '',
                                     deliveryCharges: '',
                                     deliveredOrders: ''
                                 });
@@ -1194,6 +1296,12 @@ function ProfitCalculator() {
                                                     <span style={{ color: '#6b7280' }}>Real Price:</span>
                                                     <span style={{ fontWeight: '600', marginLeft: '4px' }}>
                                                         {calc.realPrice.toFixed(2)} AED
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span style={{ color: '#6b7280' }}>Ad Spend:</span>
+                                                    <span style={{ fontWeight: '600', marginLeft: '4px' }}>
+                                                        {calc.weeklyAdSpend ? calc.weeklyAdSpend.toFixed(2) : '0.00'} AED
                                                     </span>
                                                 </div>
                                                 <div>
