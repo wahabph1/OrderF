@@ -10,6 +10,7 @@ import { logActivity } from './utils/activity';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { verifyWahabPassword } from './auth';
+import ActionSplash from './components/ActionSplash';
 
 const API_URL = 'https://order-b.vercel.app/api/orders';
 // Removed 'All' option and excluded Wahab from main dashboard
@@ -58,6 +59,10 @@ function OrderTable() {
     const [pwdError, setPwdError] = useState('');
     const [pwdAction, setPwdAction] = useState(null); // 'edit' | 'delete' | 'deleteAll' | 'deleteSelected' | 'deleteDelivered' | 'deleteCancelled'
     const [pwdPayload, setPwdPayload] = useState(null);
+
+    // Actions menu
+    const [actionsOpen, setActionsOpen] = useState(false);
+    const [actionsSplash, setActionsSplash] = useState(false);
 
     const fetchOrders = useCallback(async () => {
         setLoading(true); 
@@ -452,57 +457,8 @@ function OrderTable() {
                     ))}
                   </select>
                   <button className="btn" onClick={handleRefresh}>Refresh</button>
-                  <div style={{ display:'flex', gap: 8, flexWrap:'wrap', alignItems:'center' }}>
-                    <button type="button" className="btn" onClick={exportAllOrders} style={{ background:'#111827', color:'#fff', border:'1px solid #0f172a' }}>Export All</button>
-                    <button type="button" className="btn" onClick={() => exportByStatus('Pending')} style={{ background:'#e5e7eb', color:'#111827', border:'1px solid #d1d5db' }}>Export Pending</button>
-                    <button type="button" className="btn" onClick={() => exportByStatus('Delivered')} style={{ background:'#22c55e', color:'#fff', border:'1px solid #16a34a' }}>Export Delivered</button>
-                    <button type="button" className="btn" onClick={() => exportByStatus('Cancelled')} style={{ background:'#ef4444', color:'#fff', border:'1px solid #dc2626' }}>Export Cancelled</button>
-                    <button 
-                      className="btn" 
-                      disabled={selectedIds.size === 0}
-                      onClick={() => openPwd('deleteSelected')}
-                      style={{ background: selectedIds.size === 0 ? '#e5e7eb' : '#f97316', color: selectedIds.size === 0 ? '#111827' : '#fff', border:'1px solid #ea580c' }}
-                      title={selectedIds.size === 0 ? 'Select rows to delete' : `Delete selected (${selectedIds.size})`}
-                    >
-                      🗑️ Delete Selected ({selectedIds.size})
-                    </button>
-                    <button 
-                      className="btn"
-                      disabled={deliveredCount === 0}
-                      onClick={() => openPwd('deleteDelivered')}
-                      style={{ background: deliveredCount === 0 ? '#e5e7eb' : '#dc2626', color: '#fff', border:'1px solid #b91c1c' }}
-                      title={deliveredCount === 0 ? 'No delivered orders' : `Delete all delivered (${deliveredCount})`}
-                    >
-                      🗑️ Delete Delivered ({deliveredCount})
-                    </button>
-                    <button 
-                      className="btn"
-                      disabled={cancelledCount === 0}
-                      onClick={() => openPwd('deleteCancelled')}
-                      style={{ background: cancelledCount === 0 ? '#e5e7eb' : '#7f1d1d', color: '#fff', border:'1px solid #7f1d1d' }}
-                      title={cancelledCount === 0 ? 'No cancelled orders' : `Delete all cancelled (${cancelledCount})`}
-                    >
-                      🗑️ Delete Cancelled ({cancelledCount})
-                    </button>
-                  </div>
-                  <button 
-                    className="btn btn-delete-all" 
-                    onClick={() => openPwd('deleteAll')}
-                    style={{
-                      background: '#ef4444',
-                      color: 'white',
-                      border: '1px solid #dc2626',
-                      marginLeft: '8px'
-                    }}
-                    title={`Delete all ${orders.length} orders`}
-                    onMouseEnter={(e) => {
-                      e.target.style.background = '#dc2626';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.background = '#ef4444';
-                    }}
-                  >
-                    🗑️ Delete All ({orders.length})
+                  <button className="btn" onClick={()=>{ setActionsSplash(true); setTimeout(()=>{ setActionsSplash(false); setActionsOpen(true); }, 600); }} title="Open actions" style={{ background:'#111827', color:'#fff', border:'1px solid #0f172a' }}>
+                    Actions ▾
                   </button>
                 </div>
               </div>
@@ -649,6 +605,46 @@ function OrderTable() {
                 onCancel={() => setConfirmCancelledOpen(false)}
                 danger
             />
+
+            <ActionSplash open={actionsSplash} label="Actions" />
+
+            {/* Actions Modal */}
+            <Modal open={actionsOpen} title="Actions" onClose={()=>setActionsOpen(false)} size="md">
+              <div className="actions-grid">
+                <button className="modal-action export-all" onClick={()=>{ setActionsOpen(false); exportAllOrders(); }}>
+                  <span>Export All</span>
+                  <span className="arrow">→</span>
+                </button>
+                <button className="modal-action export-pending" onClick={()=>{ setActionsOpen(false); exportByStatus('Pending'); }}>
+                  <span>Export Pending</span>
+                  <span className="arrow">→</span>
+                </button>
+                <button className="modal-action export-delivered" onClick={()=>{ setActionsOpen(false); exportByStatus('Delivered'); }}>
+                  <span>Export Delivered</span>
+                  <span className="arrow">→</span>
+                </button>
+                <button className="modal-action export-cancelled" onClick={()=>{ setActionsOpen(false); exportByStatus('Cancelled'); }}>
+                  <span>Export Cancelled</span>
+                  <span className="arrow">→</span>
+                </button>
+                <button className="modal-action delete-selected" disabled={selectedIds.size === 0} onClick={()=>{ setActionsOpen(false); openPwd('deleteSelected'); }}>
+                  <span>🗑️ Delete Selected ({selectedIds.size})</span>
+                  <span className="arrow">→</span>
+                </button>
+                <button className="modal-action delete-delivered" disabled={deliveredCount === 0} onClick={()=>{ setActionsOpen(false); openPwd('deleteDelivered'); }}>
+                  <span>🗑️ Delete Delivered ({deliveredCount})</span>
+                  <span className="arrow">→</span>
+                </button>
+                <button className="modal-action delete-cancelled" disabled={cancelledCount === 0} onClick={()=>{ setActionsOpen(false); openPwd('deleteCancelled'); }}>
+                  <span>🗑️ Delete Cancelled ({cancelledCount})</span>
+                  <span className="arrow">→</span>
+                </button>
+                <button className="modal-action delete-all" onClick={()=>{ setActionsOpen(false); openPwd('deleteAll'); }}>
+                  <span>🗑️ Delete All ({orders.length})</span>
+                  <span className="arrow">→</span>
+                </button>
+              </div>
+            </Modal>
 
             {/* Password Modal for protected actions */}
             <Modal open={pwdOpen} title="Enter Password" onClose={()=>setPwdOpen(false)} size="md">
