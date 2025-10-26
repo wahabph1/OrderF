@@ -1,16 +1,13 @@
 // WahabLogin.jsx - Authentication modal for Wahab Orders access
 
 import React, { useState } from 'react';
+import { WAHAB_USERNAME, WAHAB_PASSWORD } from './auth';
 
 function WahabLogin({ onLoginSuccess, onClose, targetView }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-
-    // Hardcoded credentials (you can change these)
-    const WAHAB_USERNAME = 'wahab';
-    const WAHAB_PASSWORD = 'wahab123';
 
     const handleSubmit = (e) => {
         e.preventDefault();

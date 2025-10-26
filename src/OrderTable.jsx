@@ -9,6 +9,7 @@ import LoadingPopup from './components/LoadingPopup';
 import { logActivity } from './utils/activity';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { verifyWahabPassword } from './auth';
 
 const API_URL = 'https://order-b.vercel.app/api/orders';
 // Removed 'All' option and excluded Wahab from main dashboard
@@ -30,6 +31,33 @@ function OrderTable() {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [confirmAllOpen, setConfirmAllOpen] = useState(false);
     const [targetOrder, setTargetOrder] = useState(null);
+
+    // Multi-select state
+    const [selectedIds, setSelectedIds] = useState(new Set());
+    const allSelected = orders.length > 0 && selectedIds.size === orders.length;
+    const deliveredCount = (orders || []).filter(o => String(o.deliveryStatus).toLowerCase() === 'delivered').length;
+    const cancelledCount = (orders || []).filter(o => String(o.deliveryStatus).toLowerCase() === 'cancelled').length;
+    const toggleSelect = (id) => {
+        setSelectedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            return next;
+        });
+    };
+    const toggleSelectAll = () => {
+        if (allSelected) {
+            setSelectedIds(new Set());
+        } else {
+            setSelectedIds(new Set(orders.map(o => o._id)));
+        }
+    };
+
+    // Password gate for edit/delete actions
+    const [pwdOpen, setPwdOpen] = useState(false);
+    const [pwd, setPwd] = useState('');
+    const [pwdError, setPwdError] = useState('');
+    const [pwdAction, setPwdAction] = useState(null); // 'edit' | 'delete' | 'deleteAll' | 'deleteSelected' | 'deleteDelivered' | 'deleteCancelled'
+    const [pwdPayload, setPwdPayload] = useState(null);
 
     const fetchOrders = useCallback(async () => {
         setLoading(true); 
@@ -68,6 +96,37 @@ function OrderTable() {
     const askDelete = (order) => {
         setTargetOrder(order);
         setConfirmOpen(true);
+    };
+
+    const openPwd = (action, payload = null) => {
+        setPwdOpen(true);
+        setPwd('');
+        setPwdError('');
+        setPwdAction(action);
+        setPwdPayload(payload);
+    };
+
+    const submitPwd = () => {
+        if (!verifyWahabPassword(pwd)) {
+            setPwdError('Incorrect password');
+            return;
+        }
+        if (pwdAction === 'edit' && pwdPayload) {
+            handleEditClick(pwdPayload);
+        } else if (pwdAction === 'delete' && pwdPayload) {
+            askDelete(pwdPayload);
+        } else if (pwdAction === 'deleteAll') {
+            handleDeleteAllOrders();
+        } else if (pwdAction === 'deleteSelected') {
+            handleDeleteSelected();
+        } else if (pwdAction === 'deleteDelivered') {
+            handleDeleteDelivered();
+        } else if (pwdAction === 'deleteCancelled') {
+            handleDeleteCancelled();
+        }
+        setPwdOpen(false);
+        setPwdAction(null);
+        setPwdPayload(null);
     };
 
     const confirmDelete = async () => {
@@ -118,6 +177,77 @@ function OrderTable() {
             return;
         }
         setConfirmAllOpen(true);
+    };
+
+    // Delete delivered orders (with confirm)
+    const [confirmDeliveredOpen, setConfirmDeliveredOpen] = useState(false);
+    const handleDeleteDelivered = () => {
+        if (deliveredCount === 0) {
+            alert('No delivered orders to delete');
+            return;
+        }
+        setConfirmDeliveredOpen(true);
+    };
+    const confirmDeleteDelivered = async () => {
+        const toDelete = (orders || []).filter(o => String(o.deliveryStatus).toLowerCase() === 'delivered');
+        try {
+            await Promise.all(toDelete.map(o => axios.delete(`${API_URL}/${o._id}`)));
+            setOrders(prev => prev.filter(o => String(o.deliveryStatus).toLowerCase() !== 'delivered'));
+            logActivity({ type: 'delete', title: 'Delivered orders deleted', detail: `${toDelete.length} orders` });
+        } catch (err) {
+            alert('❌ Failed to delete some delivered orders.');
+            console.error(err);
+        } finally {
+            setConfirmDeliveredOpen(false);
+        }
+    };
+
+    // Delete cancelled orders (with confirm)
+    const [confirmCancelledOpen, setConfirmCancelledOpen] = useState(false);
+    const handleDeleteCancelled = () => {
+        if (cancelledCount === 0) {
+            alert('No cancelled orders to delete');
+            return;
+        }
+        setConfirmCancelledOpen(true);
+    };
+    const confirmDeleteCancelled = async () => {
+        const toDelete = (orders || []).filter(o => String(o.deliveryStatus).toLowerCase() === 'cancelled');
+        try {
+            await Promise.all(toDelete.map(o => axios.delete(`${API_URL}/${o._id}`)));
+            setOrders(prev => prev.filter(o => String(o.deliveryStatus).toLowerCase() !== 'cancelled'));
+            logActivity({ type: 'delete', title: 'Cancelled orders deleted', detail: `${toDelete.length} orders` });
+        } catch (err) {
+            alert('❌ Failed to delete some cancelled orders.');
+            console.error(err);
+        } finally {
+            setConfirmCancelledOpen(false);
+        }
+    };
+
+    // Delete selected orders (with confirm)
+    const [confirmSelectedOpen, setConfirmSelectedOpen] = useState(false);
+    const handleDeleteSelected = () => {
+        if (selectedIds.size === 0) {
+            alert('Select at least one order');
+            return;
+        }
+        setConfirmSelectedOpen(true);
+    };
+
+    const confirmDeleteSelected = async () => {
+        const ids = Array.from(selectedIds);
+        try {
+            await Promise.all(ids.map(id => axios.delete(`${API_URL}/${id}`)));
+            setOrders(prev => prev.filter(o => !selectedIds.has(o._id)));
+            setSelectedIds(new Set());
+            logActivity({ type: 'delete', title: 'Selected orders deleted', detail: `${ids.length} orders` });
+        } catch (err) {
+            alert('❌ Failed to delete some selected orders.');
+            console.error(err);
+        } finally {
+            setConfirmSelectedOpen(false);
+        }
     };
 
     const confirmDeleteAll = async () => {
@@ -322,15 +452,42 @@ function OrderTable() {
                     ))}
                   </select>
                   <button className="btn" onClick={handleRefresh}>Refresh</button>
-                  <div style={{ display:'flex', gap: 8, flexWrap:'wrap' }}>
+                  <div style={{ display:'flex', gap: 8, flexWrap:'wrap', alignItems:'center' }}>
                     <button type="button" className="btn" onClick={exportAllOrders} style={{ background:'#111827', color:'#fff', border:'1px solid #0f172a' }}>Export All</button>
                     <button type="button" className="btn" onClick={() => exportByStatus('Pending')} style={{ background:'#e5e7eb', color:'#111827', border:'1px solid #d1d5db' }}>Export Pending</button>
                     <button type="button" className="btn" onClick={() => exportByStatus('Delivered')} style={{ background:'#22c55e', color:'#fff', border:'1px solid #16a34a' }}>Export Delivered</button>
                     <button type="button" className="btn" onClick={() => exportByStatus('Cancelled')} style={{ background:'#ef4444', color:'#fff', border:'1px solid #dc2626' }}>Export Cancelled</button>
+                    <button 
+                      className="btn" 
+                      disabled={selectedIds.size === 0}
+                      onClick={() => openPwd('deleteSelected')}
+                      style={{ background: selectedIds.size === 0 ? '#e5e7eb' : '#f97316', color: selectedIds.size === 0 ? '#111827' : '#fff', border:'1px solid #ea580c' }}
+                      title={selectedIds.size === 0 ? 'Select rows to delete' : `Delete selected (${selectedIds.size})`}
+                    >
+                      🗑️ Delete Selected ({selectedIds.size})
+                    </button>
+                    <button 
+                      className="btn"
+                      disabled={deliveredCount === 0}
+                      onClick={() => openPwd('deleteDelivered')}
+                      style={{ background: deliveredCount === 0 ? '#e5e7eb' : '#dc2626', color: '#fff', border:'1px solid #b91c1c' }}
+                      title={deliveredCount === 0 ? 'No delivered orders' : `Delete all delivered (${deliveredCount})`}
+                    >
+                      🗑️ Delete Delivered ({deliveredCount})
+                    </button>
+                    <button 
+                      className="btn"
+                      disabled={cancelledCount === 0}
+                      onClick={() => openPwd('deleteCancelled')}
+                      style={{ background: cancelledCount === 0 ? '#e5e7eb' : '#7f1d1d', color: '#fff', border:'1px solid #7f1d1d' }}
+                      title={cancelledCount === 0 ? 'No cancelled orders' : `Delete all cancelled (${cancelledCount})`}
+                    >
+                      🗑️ Delete Cancelled ({cancelledCount})
+                    </button>
                   </div>
                   <button 
                     className="btn btn-delete-all" 
-                    onClick={handleDeleteAllOrders}
+                    onClick={() => openPwd('deleteAll')}
                     style={{
                       background: '#ef4444',
                       color: 'white',
@@ -357,6 +514,7 @@ function OrderTable() {
                   <table className="table table--profile">
                     <thead>
                       <tr>
+                        <th><input type="checkbox" checked={allSelected} onChange={toggleSelectAll} /></th>
                         <th>Serial No.</th>
                         <th>Date</th>
                         <th>Owner</th>
@@ -367,7 +525,8 @@ function OrderTable() {
                     <tbody>
                       {orders.map(order => (
                         <tr key={order._id}>
-<td data-label="Serial No.">{order.serialNumber}</td>
+                          <td data-label="Select"><input type="checkbox" checked={selectedIds.has(order._id)} onChange={()=>toggleSelect(order._id)} /></td>
+                          <td data-label="Serial No.">{order.serialNumber}</td>
                           <td data-label="Date">{new Date(order.orderDate || order.createdAt).toLocaleDateString()}</td>
                           <td data-label="Owner">{order.owner}</td>
                           <td data-label="Status">
@@ -406,8 +565,8 @@ function OrderTable() {
                             )}
                           </td>
 <td data-label="Actions" className="actions-cell">
-                            <button className="btn btn-edit" onClick={()=>handleEditClick(order)}>Edit</button>
-                            <button className="btn btn-delete" onClick={()=>askDelete(order)}>Delete</button>
+                            <button className="btn btn-edit" onClick={()=>openPwd('edit', order)}>Edit</button>
+                            <button className="btn btn-delete" onClick={()=>openPwd('delete', order)}>Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -460,6 +619,54 @@ function OrderTable() {
                 onCancel={() => setConfirmAllOpen(false)}
                 danger
             />
+            <ConfirmDialog
+                open={confirmSelectedOpen}
+                title={`Delete selected (${selectedIds.size}) orders?`}
+                description={`This will permanently remove ${selectedIds.size} selected orders.`}
+                confirmText="Delete Selected"
+                cancelText="Cancel"
+                onConfirm={confirmDeleteSelected}
+                onCancel={() => setConfirmSelectedOpen(false)}
+                danger
+            />
+            <ConfirmDialog
+                open={confirmDeliveredOpen}
+                title={`Delete ALL Delivered orders?`}
+                description={`This will permanently remove ${deliveredCount} delivered orders.`}
+                confirmText="Delete Delivered"
+                cancelText="Cancel"
+                onConfirm={confirmDeleteDelivered}
+                onCancel={() => setConfirmDeliveredOpen(false)}
+                danger
+            />
+            <ConfirmDialog
+                open={confirmCancelledOpen}
+                title={`Delete ALL Cancelled orders?`}
+                description={`This will permanently remove ${cancelledCount} cancelled orders.`}
+                confirmText="Delete Cancelled"
+                cancelText="Cancel"
+                onConfirm={confirmDeleteCancelled}
+                onCancel={() => setConfirmCancelledOpen(false)}
+                danger
+            />
+
+            {/* Password Modal for protected actions */}
+            <Modal open={pwdOpen} title="Enter Password" onClose={()=>setPwdOpen(false)} size="md">
+              <div style={{ display:'grid', gap: 10 }}>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={pwd}
+                  onChange={(e)=>setPwd(e.target.value)}
+                  style={{ padding:'10px 12px', border:'2px solid #e5e7eb', borderRadius:8 }}
+                />
+                {pwdError && <div style={{ color:'#dc2626', fontWeight:600 }}>{pwdError}</div>}
+                <div style={{ display:'flex', justifyContent:'flex-end', gap:8 }}>
+                  <button className="btn" onClick={()=>setPwdOpen(false)} style={{ background:'#e5e7eb', border:'1px solid #d1d5db' }}>Cancel</button>
+                  <button className="btn" onClick={submitPwd} style={{ background:'#2563eb', color:'#fff', border:'1px solid #1e40af' }}>Continue</button>
+                </div>
+              </div>
+            </Modal>
         </div>
     );
 }
