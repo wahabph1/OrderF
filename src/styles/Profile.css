@@ -90,6 +90,33 @@
 .table th { border-bottom: 1px solid #e5e7eb; }
 .table td { border-bottom: 1px solid #f1f5f9; }
 
+/* Invoice generator responsive helpers */
+.invoice-form-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+@media (max-width: 480px) {
+  .invoice-form-grid { grid-template-columns: 1fr; }
+}
+
+.invoice-item-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 6px; }
+@media (max-width: 600px) {
+  .invoice-item-row { grid-template-columns: 1fr 1fr; }
+  .invoice-item-row button { justify-self: end; grid-column: span 2; }
+}
+@media (max-width: 400px) {
+  .invoice-item-row { grid-template-columns: 1fr; }
+  .invoice-item-row button { grid-column: 1; }
+}
+
+.invoice-preview { border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+.invoice-header { flex-wrap: wrap; gap: 12px; }
+.invoice-table td:first-child { word-break: break-word; }
+@media (max-width: 520px) {
+  .invoice-preview { font-size: 12px; }
+  .invoice-table th, .invoice-table td { padding: 8px; }
+}
+@media (max-width: 380px) {
+  .invoice-totals { min-width: 160px !important; }
+}
+
 /* Simple appear effects */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }

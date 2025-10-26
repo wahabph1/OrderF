@@ -368,7 +368,7 @@ function OrderTable() {
                       {orders.map(order => (
                         <tr key={order._id}>
 <td data-label="Serial No.">{order.serialNumber}</td>
-                          <td data-label="Date">{new Date(order.orderDate).toLocaleDateString()}</td>
+                          <td data-label="Date">{new Date(order.orderDate || order.createdAt).toLocaleDateString()}</td>
                           <td data-label="Owner">{order.owner}</td>
                           <td data-label="Status">
                             {editingStatusId === order._id ? (

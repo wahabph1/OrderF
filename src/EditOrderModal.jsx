@@ -29,7 +29,9 @@ function EditOrderModal({ order, onClose, onOrderUpdated }) {
         setError(null);
 
         try {
-            const response = await axios.put(`${API_URL}/${order._id}`, formData);
+            // Normalize date to ISO midnight UTC
+            const payload = { ...formData, orderDate: formData.orderDate ? new Date(`${formData.orderDate}T00:00:00.000Z`).toISOString() : undefined };
+            const response = await axios.put(`${API_URL}/${order._id}`, payload);
             onOrderUpdated(response.data);
             alert(`Order ${formData.serialNumber} successfully updated!`);
             onClose();

@@ -21,8 +21,12 @@ function WahabOrderForm({ onOrderAdded }) {
         setLoading(true);
 
         try {
-            const newOrder = { serialNumber, owner, orderDate };
-            await axios.post(API_URL, newOrder);
+            // Normalize date to ISO midnight UTC to avoid overrides/timezone issues
+            const isoDate = orderDate ? new Date(`${orderDate}T00:00:00.000Z`).toISOString() : undefined;
+            const newOrder = { serialNumber, owner, orderDate: isoDate };
+            console.log('POST /orders payload (Wahab):', newOrder);
+            const res = await axios.post(API_URL, newOrder);
+            console.log('Created order response (Wahab):', res?.data);
             
             setMessage(`✅ Wahab Order ${serialNumber} added successfully!`);
             
@@ -44,7 +48,7 @@ function WahabOrderForm({ onOrderAdded }) {
             <form onSubmit={handleSubmit}>
                 <div className="form-grid">
                     <div className="input-group">
-                        <label>Serial Number (Unique):</label>
+                        <label>Serial Number (duplicates allowed for Wahab):</label>
                         <input 
                             type="text" 
                             placeholder="Serial Number for Wahab" 

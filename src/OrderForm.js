@@ -20,8 +20,12 @@ function OrderForm({ onOrderAdded }) {
         setLoading(true);
 
         try {
-            const newOrder = { serialNumber, owner, orderDate };
-            await axios.post(API_URL, newOrder);
+            // Normalize date to ISO midnight UTC to avoid overrides/timezone issues
+            const isoDate = orderDate ? new Date(`${orderDate}T00:00:00.000Z`).toISOString() : undefined;
+            const newOrder = { serialNumber, owner, orderDate: isoDate };
+            console.log('POST /orders payload:', newOrder);
+            const res = await axios.post(API_URL, newOrder);
+            console.log('Created order response:', res?.data);
             
             setMessage(`✅ Order ${serialNumber} added successfully!`);
             

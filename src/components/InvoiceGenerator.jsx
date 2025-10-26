@@ -66,9 +66,9 @@ export default function InvoiceGenerator() {
 
   return (
     <div className="profile-card" style={{ padding: 16, border: '1px solid #e5e7eb', borderRadius: 8 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+      <div className="invoice-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 8, flexWrap: 'wrap' }}>
         <h3 style={{ margin: 0 }}>Invoice Generator</h3>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <label style={{ border: '1px solid #d1d5db', padding: '8px 12px', borderRadius: 6, cursor: 'pointer', background:'#e5e7eb' }}>
             Upload logo
             <input type="file" accept="image/*" onChange={onLogo} style={{ display: 'none' }} />
@@ -83,7 +83,7 @@ export default function InvoiceGenerator() {
       </div>
 
       {/* Form */}
-      <div style={{ display:'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', marginBottom: 12 }}>
+      <div className="invoice-form-grid" style={{ marginBottom: 12 }}>
         <div className="input-group"><label>Invoice No</label><input value={form.invoiceNo} onChange={e=>setForm({ ...form, invoiceNo: e.target.value })} /></div>
         <div className="input-group"><label>Date</label><input type="date" value={form.date} onChange={e=>setForm({ ...form, date: e.target.value })} /></div>
         <div className="input-group"><label>Your Company</label><input value={form.company} onChange={e=>setForm({ ...form, company: e.target.value })} /></div>
@@ -96,12 +96,12 @@ export default function InvoiceGenerator() {
 
       {/* Items */}
       <div style={{ marginBottom: 12 }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 6 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 6, gap: 8, flexWrap: 'wrap' }}>
           <strong>Items</strong>
           <button type="button" onClick={addItem} style={{ background:'#2563eb', color:'#fff', border:'1px solid #1e40af', padding:'6px 10px', borderRadius:6 }}>Add Item</button>
         </div>
         {items.map((it, i) => (
-          <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr auto', gap:8, marginBottom:6 }}>
+          <div key={i} className="invoice-item-row">
             <input placeholder="Description" value={it.desc} onChange={e=>setItem(i,{desc:e.target.value})} />
             <input type="number" placeholder="Qty" value={it.qty} onChange={e=>setItem(i,{qty:e.target.value})} />
             <input type="number" placeholder="Unit Price" value={it.price} onChange={e=>setItem(i,{price:e.target.value})} />
@@ -112,9 +112,9 @@ export default function InvoiceGenerator() {
 
 
       {/* Invoice Preview (Captured) */}
-      <div ref={previewRef} style={{ background:'#fff', border:'1px solid #e5e7eb', borderRadius:12, overflow:'hidden' }}>
+      <div ref={previewRef} className="invoice-preview" style={{ background:'#fff' }}>
         {/* Header */}
-        <div style={{ background:'linear-gradient(135deg,#1e293b 0%,#334155 100%)', color:'#fff', padding:20, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div className="invoice-header" style={{ background:'linear-gradient(135deg,#1e293b 0%,#334155 100%)', color:'#fff', padding:20, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:12 }}>
             {logo ? (
               <img src={logo} alt="logo" style={{ width:48, height:48, borderRadius:8, objectFit:'cover', background:'#fff' }} />
@@ -134,14 +134,14 @@ export default function InvoiceGenerator() {
         </div>
 
         {/* Bill to */}
-        <div style={{ display:'flex', justifyContent:'space-between', padding:20, gap:20, flexWrap:'wrap' }}>
+        <div className="invoice-billto" style={{ display:'flex', justifyContent:'space-between', padding:20, gap:20, flexWrap:'wrap' }}>
           <div>
             <div style={{ fontSize:12, color:'#6b7280' }}>BILL TO</div>
             <div style={{ fontWeight:700 }}>{form.billTo}</div>
             <div>{form.billAddress}</div>
             <div>{form.phone}</div>
           </div>
-          <div style={{ padding:12, border:'1px dashed #cbd5e1', borderRadius:8, minWidth:220, background:'#f8fafc' }}>
+          <div className="invoice-totals" style={{ padding:12, border:'1px dashed #cbd5e1', borderRadius:8, minWidth:220, background:'#f8fafc' }}>
             <div style={{ display:'grid', gridTemplateColumns:'1fr auto', rowGap:6 }}>
               <div style={{ color:'#64748b' }}>Subtotal</div>
               <div style={{ fontWeight:600 }}>AED {currency(totals.subtotal)}</div>
@@ -155,7 +155,7 @@ export default function InvoiceGenerator() {
 
         {/* Items table */}
         <div style={{ padding:'0 20px 20px' }}>
-          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:14 }}>
+          <table className="invoice-table" style={{ width:'100%', borderCollapse:'collapse', fontSize:14 }}>
             <thead>
               <tr>
                 <th style={{ textAlign:'left', padding:'10px', background:'#f1f5f9' }}>Description</th>
@@ -178,7 +178,7 @@ export default function InvoiceGenerator() {
         </div>
 
         {/* Footer */}
-        <div style={{ padding:20, background:'#f8fafc', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+        <div className="invoice-footer" style={{ padding:20, background:'#f8fafc', display:'flex', justifyContent:'space-between', alignItems:'center', gap:12, flexWrap:'wrap' }}>
           <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
             <div style={{ color:'#64748b' }}>Thank you for shopping with {form.company}!</div>
             <span style={{ background:'#e0f2fe', color:'#075985', border:'1px solid #0284c7', padding:'6px 10px', borderRadius:6, fontWeight:600 }}>
