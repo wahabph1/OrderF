@@ -8,7 +8,11 @@ const API_URL = 'https://order-b.vercel.app/api/orders';
 
 function WahabOrderForm({ onOrderAdded }) {
     const [serialNumber, setSerialNumber] = useState('');
-    const [orderDate, setOrderDate] = useState('');
+    const [orderDate, setOrderDate] = useState(() => {
+        // Set today's date as default in YYYY-MM-DD format
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    });
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -31,8 +35,10 @@ function WahabOrderForm({ onOrderAdded }) {
             setMessage(`✅ Wahab Order ${serialNumber} added successfully!`);
             
             setSerialNumber('');
-            setOrderDate('');
-            onOrderAdded(); 
+            // Reset to today's date
+            const today = new Date();
+            setOrderDate(today.toISOString().split('T')[0]);
+            onOrderAdded();
 
         } catch (error) {
             setMessage(`❌ Error: ${error.response?.data?.message || 'Could not connect to server or Serial No. already exists.'}`);
