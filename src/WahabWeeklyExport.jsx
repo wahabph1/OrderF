@@ -85,6 +85,24 @@ export default function WahabWeeklyExport() {
     doc.text(`Wahab Orders — ${fmt(week.start)} to ${fmt(week.end)}`, 40, 40);
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleString()}  •  Total: ${weekOrders.length}`, 40, 58);
+
+    // Legend (status colors)
+    const legendY = 64;
+    const legendItems = [
+      { label: 'Pending', color: [234, 179, 8] },      // amber-500
+      { label: 'In Transit', color: [59, 130, 246] },  // blue-500
+      { label: 'Delivered', color: [34, 197, 94] },    // green-500
+      { label: 'Cancelled', color: [239, 68, 68] },    // red-500
+    ];
+    let lx = 40;
+    legendItems.forEach(item => {
+      doc.setFillColor(...item.color);
+      doc.rect(lx, legendY - 8, 10, 10, 'F');
+      doc.setTextColor(30);
+      doc.text(item.label, lx + 14, legendY);
+      lx += 90;
+    });
+
     const body = weekOrders.map((o, i) => [
       String(i + 1),
       o.serialNumber || '-',
@@ -92,7 +110,7 @@ export default function WahabWeeklyExport() {
       o.deliveryStatus || '-',
     ]);
     autoTable(doc, {
-      startY: 76,
+      startY: 80,
       head: [['#', 'Serial', 'Date', 'Status']],
       body,
       styles: { fontSize: 9, cellPadding: 6 },
@@ -103,10 +121,27 @@ export default function WahabWeeklyExport() {
         2: { cellWidth: 110 },
         3: { cellWidth: 'auto' },
       },
+      didParseCell: (data) => {
+        if (data.section === 'body' && data.column.index === 3) {
+          const s = String(data.cell.raw || '').toLowerCase();
+          let fill = null;
+          if (s === 'pending') fill = [234, 179, 8];
+          else if (s === 'in transit') fill = [59, 130, 246];
+          else if (s === 'delivered') fill = [34, 197, 94];
+          else if (s === 'cancelled') fill = [239, 68, 68];
+          if (fill) {
+            data.cell.styles.fillColor = fill;
+            data.cell.styles.textColor = 255;
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.styles.halign = 'center';
+          }
+        }
+      },
       didDrawPage: () => {
         const pageSize = doc.internal.pageSize;
         const pageHeight = pageSize.getHeight();
         doc.setFontSize(9);
+        doc.setTextColor(0);
         doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageSize.getWidth() - 80, pageHeight - 16);
       }
     });
