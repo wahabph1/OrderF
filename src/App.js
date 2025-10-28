@@ -13,6 +13,7 @@ import ProfitCalculator from '../src/ProfitCalculator'; // Profit Calculator
 import Dashboard from './Dashboard';
 import LoadingPopup from './components/LoadingPopup';
 import AutoDetect from '../src/AutoDetect';
+import WahabWeeklyExport from './WahabWeeklyExport';
 
 function App() {
     // Splash screen state
@@ -39,7 +40,7 @@ function App() {
     // No persistent authentication - always require login after refresh
     // Reset to dashboard if trying to access protected views without authentication
     useEffect(() => {
-        const PROTECTED_VIEWS = ['wahabOrders', 'profile'];
+        const PROTECTED_VIEWS = ['wahabOrders', 'wahabWeekly', 'profile'];
         if (PROTECTED_VIEWS.includes(currentView) && !wahabAuthenticated) {
             setCurrentView('dashboard');
         }
@@ -47,7 +48,7 @@ function App() {
     
     // Function jo view change karega
     const handleNavClick = (view) => {
-        const PROTECTED_VIEWS = ['wahabOrders', 'profile'];
+        const PROTECTED_VIEWS = ['wahabOrders', 'wahabWeekly', 'profile'];
         if (PROTECTED_VIEWS.includes(view)) {
             if (wahabAuthenticated) {
                 setCurrentView(view);
@@ -107,6 +108,8 @@ function App() {
                     <Profile />
                 ) : currentView === 'wahabOrders' ? (
                     <WahabOrderTable />
+                ) : currentView === 'wahabWeekly' ? (
+                    <WahabWeeklyExport />
                 ) : currentView === 'profitCalculator' ? (
                     <ProfitCalculator />
                 ) : currentView === 'autoDetect' ? (

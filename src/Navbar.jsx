@@ -81,6 +81,15 @@ function Navbar({ onNavClick, currentView }) {
 
           <button
             type="button"
+            className={currentView === 'wahabWeekly' ? 'nav-link active' : 'nav-link'}
+            onClick={() => handleNavClick('wahabWeekly')}
+          >
+            <span className="nav-shine" aria-hidden></span>
+            Wahab Weekly PDFs
+          </button>
+
+          <button
+            type="button"
             className={currentView === 'profitCalculator' ? 'nav-link active' : 'nav-link'}
             onClick={() => handleNavClick('profitCalculator')}
           >
