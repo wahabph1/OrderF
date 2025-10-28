@@ -89,18 +89,20 @@ export default function WahabWeeklyExport() {
     // Legend (status colors)
     const legendY = 64;
     const legendItems = [
-      { label: 'Pending', color: [234, 179, 8] },      // amber-500
-      { label: 'In Transit', color: [59, 130, 246] },  // blue-500
-      { label: 'Delivered', color: [34, 197, 94] },    // green-500
-      { label: 'Cancelled', color: [239, 68, 68] },    // red-500
+      // Match table.css badge colors (bg, text, border)
+      { label: 'Pending', bg: [255, 247, 237], text: [180, 83, 9], border: [254, 215, 170] },
+      { label: 'In Transit', bg: [238, 242, 255], text: [67, 56, 202], border: [199, 210, 254] },
+      { label: 'Delivered', bg: [236, 253, 245], text: [21, 128, 61], border: [187, 247, 208] },
+      { label: 'Cancelled', bg: [254, 242, 242], text: [185, 28, 28], border: [254, 202, 202] },
     ];
     let lx = 40;
     legendItems.forEach(item => {
-      doc.setFillColor(...item.color);
-      doc.rect(lx, legendY - 8, 10, 10, 'F');
-      doc.setTextColor(30);
+      doc.setFillColor(...item.bg);
+      doc.setDrawColor(...item.border);
+      doc.rect(lx, legendY - 8, 10, 10, 'FD');
+      doc.setTextColor(...item.text);
       doc.text(item.label, lx + 14, legendY);
-      lx += 90;
+      lx += 110;
     });
 
     const body = weekOrders.map((o, i) => [
@@ -124,14 +126,17 @@ export default function WahabWeeklyExport() {
       didParseCell: (data) => {
         if (data.section === 'body' && data.column.index === 3) {
           const s = String(data.cell.raw || '').toLowerCase();
-          let fill = null;
-          if (s === 'pending') fill = [234, 179, 8];
-          else if (s === 'in transit') fill = [59, 130, 246];
-          else if (s === 'delivered') fill = [34, 197, 94];
-          else if (s === 'cancelled') fill = [239, 68, 68];
-          if (fill) {
-            data.cell.styles.fillColor = fill;
-            data.cell.styles.textColor = 255;
+          // Match table.css badge palette
+          let bg = null, text = null, border = null;
+          if (s === 'pending') { bg = [255, 247, 237]; text = [180, 83, 9]; border = [254, 215, 170]; }
+          else if (s === 'in transit') { bg = [238, 242, 255]; text = [67, 56, 202]; border = [199, 210, 254]; }
+          else if (s === 'delivered') { bg = [236, 253, 245]; text = [21, 128, 61]; border = [187, 247, 208]; }
+          else if (s === 'cancelled') { bg = [254, 242, 242]; text = [185, 28, 28]; border = [254, 202, 202]; }
+          if (bg) {
+            data.cell.styles.fillColor = bg;
+            data.cell.styles.textColor = text;
+            data.cell.styles.lineColor = border;
+            data.cell.styles.lineWidth = 0.5;
             data.cell.styles.fontStyle = 'bold';
             data.cell.styles.halign = 'center';
           }
