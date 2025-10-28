@@ -12,7 +12,7 @@ import autoTable from 'jspdf-autotable';
 import { verifyWahabPassword } from './auth';
 import ActionSplash from './components/ActionSplash';
 
-const API_URL = 'https://order-b.vercel.app/api/orders';
+const API_URL = process.env.REACT_APP_API_BASE_URL || 'https://order-b.vercel.app/api/orders';
 // Removed 'All' option and excluded Wahab from main dashboard
 const ownerOptions = ['All (Exc. Wahab)', 'Emirate Essentials', 'Ahsan', 'Habibi Tools']; 
 const statusOptions = ['Pending', 'In Transit', 'Delivered', 'Cancelled'];
@@ -64,8 +64,9 @@ function OrderTable() {
     const [actionsOpen, setActionsOpen] = useState(false);
     const [actionsSplash, setActionsSplash] = useState(false);
 
-    const fetchOrders = useCallback(async () => {
-        setLoading(true); 
+    const fetchOrders = useCallback(async (opts = {}) => {
+        const { silent = false } = opts;
+        if (!silent) setLoading(true); 
         setError(null);
         
         let url = API_URL;
@@ -95,7 +96,7 @@ function OrderTable() {
         } catch (err) {
             setError('Failed to fetch orders from server.');
             console.error(err);
-        } finally { setLoading(false); }
+        } finally { if (!silent) setLoading(false); }
     }, [filterOwner, searchTerm]);
 
     const askDelete = (order) => {
@@ -150,7 +151,7 @@ function OrderTable() {
 
     const handleEditClick = (order) => { setCurrentOrder(order); setIsEditing(true); };
     const handleCloseModal = () => { setIsEditing(false); setCurrentOrder(null); };
-    const handleRefresh = useCallback(() => fetchOrders(), [fetchOrders]);
+    const handleRefresh = useCallback((opts = {}) => fetchOrders(opts), [fetchOrders]);
     
     // Handle inline status change
     const handleStatusChange = async (orderId, newStatus) => {
@@ -548,7 +549,7 @@ function OrderTable() {
             <Modal open={showAddModal} title="Add New Order" onClose={() => setShowAddModal(false)}>
               <OrderForm 
                 onOrderAdded={() => {
-                  handleRefresh();
+                  handleRefresh({ silent: true });
                   setShowAddModal(false);
                 }} 
               />

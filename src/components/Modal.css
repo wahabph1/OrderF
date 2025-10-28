@@ -3,11 +3,12 @@
   position: fixed;
   inset: 0;
   background: radial-gradient(1200px 600px at 10% 10%, rgba(2,6,23,.65), rgba(2,6,23,.55) 40%, rgba(2,6,23,.6) 100%);
-  backdrop-filter: blur(2px);
+  /* reduced motion & heavy effects trimmed for snappier open */
+  /* backdrop-filter: blur(2px); */
   display: grid;
   place-items: center;
   z-index: 10000;
-  animation: mFadeIn .18s ease-out;
+  animation: mFadeIn .12s linear;
 }
 
 /* Dialog */
@@ -18,8 +19,8 @@
   background: linear-gradient(180deg, #ffffff, #f9fafb);
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  box-shadow: 0 30px 80px rgba(2,6,23,.35), 0 0 0 1px rgba(255,255,255,0.6) inset;
-  animation: mPop .22s cubic-bezier(.2,.8,.2,1);
+  box-shadow: 0 16px 40px rgba(2,6,23,.25), 0 0 0 1px rgba(255,255,255,0.4) inset;
+  animation: mPop .12s linear;
 }
 .m-dialog.m-sm { width: min(92vw, 420px); }
 .m-dialog.m-lg { width: min(96vw, 720px); }
@@ -52,6 +53,6 @@
 /* Animations */
 @keyframes mFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mPop {
-  from { transform: translateY(12px) scale(.96); opacity: 0; }
+  from { transform: translateY(6px) scale(.99); opacity: 0; }
   to   { transform: translateY(0) scale(1); opacity: 1; }
 }

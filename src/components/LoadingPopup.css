@@ -51,3 +51,12 @@
   .lp-overlay, .lp-box, .lp-shine, .lp-spinner, .lp-ring, .lp-ring2, .lp-dot, .lp-orb, .lp-bar > span { animation: none !important; }
   .lp-overlay::before, .lp-box::before, .lp-halo { display: none !important; }
 }
+
+/* Force lighter animation when used for quick list refreshes */
+.lp-overlay.light {
+  background: rgba(2,6,23,0.35);
+}
+.lp-box.light { 
+  animation-duration: .12s; 
+  filter: none; 
+}

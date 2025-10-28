@@ -15,7 +15,7 @@ import autoTable from 'jspdf-autotable';
 import { verifyWahabPassword } from './auth';
 import ActionSplash from './components/ActionSplash';
 
-const API_URL = 'https://order-b.vercel.app/api/orders';
+const API_URL = process.env.REACT_APP_API_BASE_URL || 'https://order-b.vercel.app/api/orders';
 const statusOptions = ['Pending', 'In Transit', 'Delivered', 'Cancelled'];
 const DEBOUNCE_DELAY = 300;
 
@@ -65,10 +65,16 @@ function WahabOrderTable() {
     // Actions UI
     const [actionsOpen, setActionsOpen] = useState(false);
     const [actionsSplash, setActionsSplash] = useState(false);
+    // Weekly export UI state
+    const [weeklyOpen, setWeeklyOpen] = useState(false);
+    const [weeklyStart, setWeeklyStart] = useState('');
+    const [weeklyEnd, setWeeklyEnd] = useState('');
+    const [exportingWeekly, setExportingWeekly] = useState(false);
 
     // Fetch only Wahab orders
-    const fetchWahabOrders = useCallback(async () => {
-        setLoading(true); 
+    const fetchWahabOrders = useCallback(async (opts = {}) => {
+        const { silent = false } = opts;
+        if (!silent) setLoading(true); 
         setError(null);
         
         let url = `${API_URL}?owner=Wahab`; // Fixed filter for Wahab
@@ -85,7 +91,7 @@ function WahabOrderTable() {
             setError('Failed to fetch Wahab orders from server.');
             console.error(err);
         } finally { 
-            setLoading(false); 
+            if (!silent) setLoading(false); 
         }
     }, [searchTerm]);
 
@@ -110,7 +116,7 @@ function WahabOrderTable() {
 
     const handleEditClick = (order) => { setCurrentOrder(order); setIsEditing(true); };
     const handleCloseModal = () => { setIsEditing(false); setCurrentOrder(null); };
-    const handleRefresh = useCallback(() => fetchWahabOrders(), [fetchWahabOrders]);
+    const handleRefresh = useCallback((opts = {}) => fetchWahabOrders(opts), [fetchWahabOrders]);
     
     // Handle inline status change
     const handleStatusChange = async (orderId, newStatus) => {
@@ -299,6 +305,84 @@ function WahabOrderTable() {
             }
         });
         safeSavePDF(doc, 'wahab-orders-all.pdf');
+    };
+
+    // Export week-wise PDFs for a given date range (inclusive)
+    const exportWeeklyByRange = async (startStr, endStr) => {
+        if (!startStr || !endStr) { alert('Please select both start and end dates'); return; }
+        const start = new Date(startStr);
+        const end = new Date(endStr);
+        if (isNaN(start) || isNaN(end)) { alert('Invalid date(s)'); return; }
+        if (start > end) { alert('Start date must be before end date'); return; }
+        const toStartOfDay = (d) => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+        const weekStartOf = (d) => { const x = toStartOfDay(d); const day = x.getDay(); const offset = (day + 6) % 7; x.setDate(x.getDate() - offset); return x; };
+        const weekEndOf = (ws) => { const x = new Date(ws); x.setDate(x.getDate() + 6); x.setHours(23,59,59,999); return x; };
+        const fmt = (d) => new Date(d).toLocaleDateString();
+
+        const inRange = (d) => {
+            const x = new Date(d);
+            return x >= toStartOfDay(start) && x <= new Date(end.getFullYear(), end.getMonth(), end.getDate(), 23,59,59,999);
+        };
+
+        const list = (orders || []).filter(o => inRange(o.orderDate || o.createdAt));
+        if (!list.length) { alert('No Wahab orders in the selected range'); return; }
+
+        // Group by week (Mon-Sun)
+        const groups = new Map();
+        for (const o of list) {
+            const od = new Date(o.orderDate || o.createdAt);
+            const ws = weekStartOf(od);
+            const key = ws.toISOString().slice(0,10);
+            if (!groups.has(key)) groups.set(key, []);
+            groups.get(key).push(o);
+        }
+
+        // Sort weeks ascending
+        const weekKeys = Array.from(groups.keys()).sort();
+        for (const key of weekKeys) {
+            const ws = new Date(key);
+            const we = weekEndOf(ws);
+            const weekOrders = groups.get(key).sort((a,b)=> new Date(a.orderDate||a.createdAt) - new Date(b.orderDate||b.createdAt));
+
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'A4' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(14);
+            doc.text(`Wahab Orders — ${fmt(ws)} to ${fmt(we)}`, 40, 40);
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleString()}  •  Total: ${weekOrders.length}`, 40, 58);
+            const body = weekOrders.map((o, i) => [
+                String(i + 1),
+                o.serialNumber || '-',
+                new Date(o.orderDate || o.createdAt).toLocaleDateString(),
+                o.owner || '-',
+                o.deliveryStatus || '-',
+            ]);
+            autoTable(doc, {
+                startY: 76,
+                head: [['#', 'Serial', 'Date', 'Owner', 'Status']],
+                body,
+                styles: { fontSize: 9, cellPadding: 6 },
+                headStyles: { fillColor: [37, 99, 235] },
+                columnStyles: {
+                    0: { cellWidth: 30 },
+                    1: { cellWidth: 140 },
+                    2: { cellWidth: 90 },
+                    3: { cellWidth: 140 },
+                    4: { cellWidth: 'auto' },
+                },
+                didDrawPage: () => {
+                    const pageSize = doc.internal.pageSize;
+                    const pageHeight = pageSize.getHeight();
+                    doc.setFontSize(9);
+                    doc.text(`Page ${doc.internal.getNumberOfPages()}`, pageSize.getWidth() - 80, pageHeight - 16);
+                }
+            });
+            const fname = `wahab-orders-${key}_to_${we.toISOString().slice(0,10)}.pdf`;
+            safeSavePDF(doc, fname);
+            // brief yield to UI
+            // eslint-disable-next-line no-await-in-loop
+            await new Promise(r => setTimeout(r, 60));
+        }
     };
 
     // Animated popup will cover UI when loading; no inline text
@@ -563,7 +647,7 @@ function WahabOrderTable() {
             <Modal open={showAddModal} title="Add Wahab Order" onClose={() => setShowAddModal(false)}>
               <WahabOrderForm 
                 onOrderAdded={() => {
-                  handleRefresh();
+                  handleRefresh({ silent: true });
                   setShowAddModal(false);
                 }} 
               />
@@ -650,6 +734,10 @@ function WahabOrderTable() {
                   <span>🗑️ Delete Delivered ({deliveredCount})</span>
                   <span className="arrow">→</span>
                 </button>
+                <button className="modal-action export-weekly" onClick={()=>{ setActionsOpen(false); setWeeklyOpen(true); }}>
+                  <span>Export Week-wise (Date Range)</span>
+                  <span className="arrow">→</span>
+                </button>
                 <button className="modal-action delete-cancelled" disabled={cancelledCount === 0} onClick={()=>{ setActionsOpen(false); openPwd('deleteCancelled'); }}>
                   <span>🗑️ Delete Cancelled ({cancelledCount})</span>
                   <span className="arrow">→</span>
@@ -658,6 +746,29 @@ function WahabOrderTable() {
                   <span>🗑️ Delete All ({orders.length})</span>
                   <span className="arrow">→</span>
                 </button>
+              </div>
+            </Modal>
+
+            {/* Weekly Export Modal */}
+            <Modal open={weeklyOpen} title="Export Wahab Orders (Week-wise)" onClose={()=>setWeeklyOpen(false)} size="md">
+              <div style={{ display:'grid', gap:12 }}>
+                <div style={{ fontSize:12, color:'#475569' }}>Example: extract PDF from 2023-03-12 to 2024-02-19</div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+                  <div>
+                    <label style={{ display:'block', fontSize:12, color:'#64748b', marginBottom:4 }}>Start date</label>
+                    <input type="date" value={weeklyStart} onChange={e=>setWeeklyStart(e.target.value)} style={{ padding:'10px 12px', border:'2px solid #e5e7eb', borderRadius:8, width:'100%' }} />
+                  </div>
+                  <div>
+                    <label style={{ display:'block', fontSize:12, color:'#64748b', marginBottom:4 }}>End date</label>
+                    <input type="date" value={weeklyEnd} onChange={e=>setWeeklyEnd(e.target.value)} style={{ padding:'10px 12px', border:'2px solid #e5e7eb', borderRadius:8, width:'100%' }} />
+                  </div>
+                </div>
+                <div style={{ display:'flex', justifyContent:'flex-end', gap:8 }}>
+                  <button className="btn" onClick={()=>setWeeklyOpen(false)} style={{ background:'#e5e7eb', border:'1px solid #d1d5db' }}>Cancel</button>
+                  <button className="btn" disabled={exportingWeekly} onClick={async()=>{ setExportingWeekly(true); try { await exportWeeklyByRange(weeklyStart, weeklyEnd); } finally { setExportingWeekly(false); } }} style={{ background:'#2563eb', color:'#fff', border:'1px solid #1e40af' }}>
+                    {exportingWeekly ? 'Exporting…' : 'Export Week-wise PDFs'}
+                  </button>
+                </div>
               </div>
             </Modal>
 
