@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import './KpiInsights.css';
 
-const API_URL = 'https://order-b.vercel.app/api/orders';
+const API_URL = 'https://order-f-ahp6.vercel.app/api/orders';
 
 function BarChart({ data = [], height = 80 }) {
   // data: array of numbers for last N days

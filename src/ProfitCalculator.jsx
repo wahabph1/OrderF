@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'https://order-b.vercel.app/api/profit';
+const API_URL = (process.env.REACT_APP_API_PROFIT_URL) || 'https://order-f-ahp6.vercel.app/api/profit';
 
 function ProfitCalculator() {
     const [selectedStore, setSelectedStore] = useState('');

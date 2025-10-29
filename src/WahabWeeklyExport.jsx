@@ -6,7 +6,7 @@ import LoadingPopup from './components/LoadingPopup';
 
 const API_URL = (process.env.REACT_APP_API_BASE_URL && typeof window !== 'undefined' && window.location.hostname === 'localhost')
   ? process.env.REACT_APP_API_BASE_URL
-  : 'https://order-b.vercel.app/api/orders';
+  : 'https://order-f-ahp6.vercel.app/api/orders';
 
 // Compute Friday-start week for a date
 function weekStartFriday(d) {

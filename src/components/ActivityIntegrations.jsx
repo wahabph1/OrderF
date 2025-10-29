@@ -3,7 +3,7 @@ import axios from 'axios';
 import { readActivity, clearActivity, logActivity } from '../utils/activity';
 import './ActivityIntegrations.css';
 
-const API_URL = 'https://order-b.vercel.app/api/orders';
+const API_URL = 'https://order-f-ahp6.vercel.app/api/orders';
 
 function Timeline() {
   const [items, setItems] = useState(() => readActivity());
