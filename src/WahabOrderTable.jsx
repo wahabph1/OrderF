@@ -111,7 +111,8 @@ function WahabOrderTable() {
             setOrders(prev => prev.filter(o => o._id !== targetOrder._id));
             logActivity({ type: 'delete', title: 'Wahab order deleted', detail: targetOrder.serialNumber || targetOrder._id, owner: targetOrder.owner || 'Wahab' });
         } catch(err) {
-            alert('Failed to delete Wahab order.');
+            const msg = err?.response?.data?.message || err?.message || 'Failed to delete Wahab order.';
+            alert(msg);
         } finally {
             setConfirmOpen(false);
             setTargetOrder(null);

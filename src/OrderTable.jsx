@@ -144,7 +144,8 @@ function OrderTable() {
             setOrders(prev => prev.filter(o => o._id !== targetOrder._id));
             logActivity({ type: 'delete', title: 'Order deleted', detail: targetOrder.serialNumber || targetOrder._id, owner: targetOrder.owner || 'Unknown' });
         } catch(err) {
-            alert('Failed to delete order.');
+            const msg = err?.response?.data?.message || err?.message || 'Failed to delete order.';
+            alert(msg);
         } finally {
             setConfirmOpen(false);
             setTargetOrder(null);
