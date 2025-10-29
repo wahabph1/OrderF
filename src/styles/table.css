@@ -320,6 +320,10 @@
 .modal-action:hover { background: #2563eb; color: #ffffff; border-color: #1e40af; }
 .modal-action .arrow { color: inherit; }
 
+/* Alternate colors (blue, white, blue, white, ...) */
+.actions-grid .modal-action:nth-child(odd) { background: #2563eb; color: #ffffff; border-color: #1e40af; }
+.actions-grid .modal-action:nth-child(even) { background: #ffffff; color: #1e3a8a; border-color: #bfdbfe; }
+
 /* Professional button styles */
 .add-order-btn {
   position: relative;
