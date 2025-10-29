@@ -34,7 +34,8 @@ export default function BulkStatusUpdate({ defaultOwner = 'All owners', fixedOwn
       if (onDone) onDone({ refresh: true });
       setSerialsText('');
     } catch (err) {
-      setMessage(`❌ Error: ${err.response?.data?.message || 'Bulk status failed'}`);
+      const msg = err?.response?.data?.message || err?.message || 'Bulk status failed';
+      setMessage(`❌ Error: ${msg}`);
     } finally { setLoading(false); }
   };
 

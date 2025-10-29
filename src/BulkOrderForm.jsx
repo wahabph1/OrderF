@@ -39,7 +39,8 @@ export default function BulkOrderForm({ onDone }) {
       setSerialsText('');
       if (onDone) onDone({ refresh: true });
     } catch (err) {
-      setMessage(`❌ Error: ${err.response?.data?.message || 'Bulk add failed'}`);
+      const msg = err?.response?.data?.message || err?.message || 'Bulk add failed';
+      setMessage(`❌ Error: ${msg}`);
     } finally {
       setLoading(false);
     }
