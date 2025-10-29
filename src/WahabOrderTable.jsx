@@ -16,7 +16,6 @@ import { verifyWahabPassword } from './auth';
 import ActionSplash from './components/ActionSplash';
 import BulkStatusUpdate from './BulkStatusUpdate';
 import WahabWeeklyExport from './WahabWeeklyExport';
-import BulkWahabOrderForm from './BulkWahabOrderForm';
 
 const API_URL = (process.env.REACT_APP_API_BASE_URL && typeof window !== 'undefined' && window.location.hostname === 'localhost')
   ? process.env.REACT_APP_API_BASE_URL
@@ -34,7 +33,6 @@ function WahabOrderTable() {
     const [showReports, setShowReports] = useState(false);
     const [editingStatusId, setEditingStatusId] = useState(null);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [showBulkModal, setShowBulkModal] = useState(false);
     // Delete confirmations
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [confirmAllOpen, setConfirmAllOpen] = useState(false);
@@ -453,57 +451,6 @@ function WahabOrderTable() {
                     <span className="nav-shine" aria-hidden></span>
                     Add Wahab Order
                 </button>
-                <button
-                    onClick={() => setShowBulkModal(true)}
-                    className="add-order-btn"
-                    style={{
-                        background: 'linear-gradient(135deg, #0f766e 0%, #10b981 50%, #34d399 100%)',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        padding: '10px 20px',
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-                        transform: 'translateY(0) scale(1)',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        letterSpacing: '0.025em',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.transform = 'translateY(-1px) scale(1.02)';
-                        e.target.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.35)';
-                        e.target.style.background = 'linear-gradient(135deg, #0d9488 0%, #10b981 50%, #34d399 100%)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.transform = 'translateY(0) scale(1)';
-                        e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.25)';
-                        e.target.style.background = 'linear-gradient(135deg, #0f766e 0%, #10b981 50%, #34d399 100%)';
-                    }}
-                    onMouseDown={(e) => {
-                        e.target.style.transform = 'translateY(0) scale(0.98)';
-                    }}
-                    onMouseUp={(e) => {
-                        e.target.style.transform = 'translateY(-1px) scale(1.02)';
-                    }}
-                >
-                    <span style={{ 
-                        fontSize: '16px', 
-                        fontWeight: '300',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '16px',
-                        height: '16px'
-                    }}>⎘</span>
-                    <span className="nav-shine" aria-hidden></span>
-                    Bulk Add (Wahab)
-                </button>
             </div>
 
             <div className="table-card">
@@ -713,15 +660,6 @@ function WahabOrderTable() {
               />
             </Modal>
 
-            {/* Bulk Add Wahab Orders Modal */}
-            <Modal open={showBulkModal} title="Bulk Add Wahab Orders" onClose={() => setShowBulkModal(false)}>
-              <BulkWahabOrderForm 
-                onDone={() => {
-                  handleRefresh({ silent: true });
-                  setShowBulkModal(false);
-                }} 
-              />
-            </Modal>
 
             {/* Delete confirmation dialogs */}
             <ConfirmDialog
