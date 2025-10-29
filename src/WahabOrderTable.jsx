@@ -14,6 +14,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { verifyWahabPassword } from './auth';
 import ActionSplash from './components/ActionSplash';
+import BulkStatusUpdate from './BulkStatusUpdate';
 import BulkWahabOrderForm from './BulkWahabOrderForm';
 
 const API_URL = (process.env.REACT_APP_API_BASE_URL && typeof window !== 'undefined' && window.location.hostname === 'localhost')
@@ -69,6 +70,7 @@ function WahabOrderTable() {
     // Actions UI
     const [actionsOpen, setActionsOpen] = useState(false);
     const [actionsSplash, setActionsSplash] = useState(false);
+    const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
     // Weekly export UI state
     const [weeklyOpen, setWeeklyOpen] = useState(false);
     const [weeklyStart, setWeeklyStart] = useState('');
@@ -811,6 +813,10 @@ function WahabOrderTable() {
                   <span>🗑️ Delete All ({orders.length})</span>
                   <span className="arrow">→</span>
                 </button>
+                <button className="modal-action export-pending" onClick={()=>{ setActionsOpen(false); setBulkStatusOpen(true); }}>
+                  <span>↻ Bulk Status Update</span>
+                  <span className="arrow">→</span>
+                </button>
               </div>
             </Modal>
 
@@ -835,6 +841,11 @@ function WahabOrderTable() {
                   </button>
                 </div>
               </div>
+            </Modal>
+
+            {/* Bulk Status Update Modal (Wahab only) */}
+            <Modal open={bulkStatusOpen} title="Bulk Status Update (Wahab)" onClose={()=>setBulkStatusOpen(false)}>
+              <BulkStatusUpdate fixedOwner="Wahab" onDone={()=>{ handleRefresh({ silent:true }); setBulkStatusOpen(false); }} />
             </Modal>
 
             {/* Password Modal */}

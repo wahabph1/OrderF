@@ -12,6 +12,7 @@ import autoTable from 'jspdf-autotable';
 import { verifyWahabPassword } from './auth';
 import ActionSplash from './components/ActionSplash';
 import BulkOrderForm from './BulkOrderForm';
+import BulkStatusUpdate from './BulkStatusUpdate';
 
 const API_URL = (process.env.REACT_APP_API_BASE_URL && typeof window !== 'undefined' && window.location.hostname === 'localhost')
   ? process.env.REACT_APP_API_BASE_URL
@@ -32,6 +33,7 @@ function OrderTable() {
     const [editingStatusId, setEditingStatusId] = useState(null);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showBulkModal, setShowBulkModal] = useState(false);
+    const [showBulkStatus, setShowBulkStatus] = useState(false);
     // Delete confirmations
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [confirmAllOpen, setConfirmAllOpen] = useState(false);
@@ -709,7 +711,19 @@ function OrderTable() {
                   <span>🗑️ Delete All ({orders.length})</span>
                   <span className="arrow">→</span>
                 </button>
+                <button className="modal-action export-pending" onClick={()=>{ setActionsOpen(false); setShowBulkStatus(true); }}>
+                  <span>↻ Bulk Status Update</span>
+                  <span className="arrow">→</span>
+                </button>
               </div>
+            </Modal>
+
+            {/* Bulk Status Update Modal */}
+            <Modal open={showBulkStatus} title="Bulk Status Update" onClose={()=>setShowBulkStatus(false)}>
+              <BulkStatusUpdate 
+                defaultOwner={'All owners'}
+                onDone={() => { handleRefresh({ silent: true }); setShowBulkStatus(false); }}
+              />
             </Modal>
 
             {/* Password Modal for protected actions */}
