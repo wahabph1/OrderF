@@ -139,8 +139,9 @@ function WahabOrderTable() {
             setEditingStatusId(null);
             logActivity({ type: 'status', title: 'Wahab status updated', detail: `${orderId} → ${newStatus}` });
         } catch (err) {
-            alert('Failed to update status.');
-            console.error(err);
+            const msg = err?.response?.data?.message || err?.message || 'Failed to update status.';
+            alert(msg);
+            console.error('Status update error:', err);
         }
     };
     
