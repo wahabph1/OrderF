@@ -15,6 +15,7 @@ import autoTable from 'jspdf-autotable';
 import { verifyWahabPassword } from './auth';
 import ActionSplash from './components/ActionSplash';
 import BulkStatusUpdate from './BulkStatusUpdate';
+import WahabWeeklyExport from './WahabWeeklyExport';
 import BulkWahabOrderForm from './BulkWahabOrderForm';
 
 const API_URL = (process.env.REACT_APP_API_BASE_URL && typeof window !== 'undefined' && window.location.hostname === 'localhost')
@@ -71,6 +72,7 @@ function WahabOrderTable() {
     const [actionsOpen, setActionsOpen] = useState(false);
     const [actionsSplash, setActionsSplash] = useState(false);
     const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
+    const [weeklyPageOpen, setWeeklyPageOpen] = useState(false);
     // Weekly export UI state
     const [weeklyOpen, setWeeklyOpen] = useState(false);
     const [weeklyStart, setWeeklyStart] = useState('');
@@ -805,6 +807,10 @@ function WahabOrderTable() {
                   <span>Export Week-wise (Date Range)</span>
                   <span className="arrow">→</span>
                 </button>
+                <button className="modal-action export-all" onClick={()=>{ setActionsOpen(false); setWeeklyPageOpen(true); }}>
+                  <span>Wahab Weekly PDFs (Fri→Thu)</span>
+                  <span className="arrow">→</span>
+                </button>
                 <button className="modal-action delete-cancelled" disabled={cancelledCount === 0} onClick={()=>{ setActionsOpen(false); openPwd('deleteCancelled'); }}>
                   <span>🗑️ Delete Cancelled ({cancelledCount})</span>
                   <span className="arrow">→</span>
@@ -846,6 +852,13 @@ function WahabOrderTable() {
             {/* Bulk Status Update Modal (Wahab only) */}
             <Modal open={bulkStatusOpen} title="Bulk Status Update (Wahab)" onClose={()=>setBulkStatusOpen(false)}>
               <BulkStatusUpdate fixedOwner="Wahab" onDone={()=>{ handleRefresh({ silent:true }); setBulkStatusOpen(false); }} />
+            </Modal>
+
+            {/* Weekly PDFs Page Modal (embeds page) */}
+            <Modal open={weeklyPageOpen} title="Wahab Weekly PDFs" onClose={()=>setWeeklyPageOpen(false)} size="md">
+              <div style={{ maxWidth:'95vw', maxHeight:'80vh', overflow:'auto' }}>
+                <WahabWeeklyExport />
+              </div>
             </Modal>
 
             {/* Password Modal */}
