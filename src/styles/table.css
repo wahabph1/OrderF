@@ -270,13 +270,13 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Button themes for row actions */
-.btn-edit { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(14,165,233,0.25); }
-.btn-edit:hover { filter: brightness(1.03); transform: translateY(-1px); box-shadow: 0 10px 18px rgba(14,165,233,0.35); }
+/* Button themes for row actions (blue + white theme) */
+.btn-edit { background: #2563eb; color: #fff; border-color: #1e40af; box-shadow: 0 6px 14px rgba(37,99,235,0.25); }
+.btn-edit:hover { filter: brightness(0.98); transform: translateY(-1px); box-shadow: 0 10px 18px rgba(37,99,235,0.35); }
 .btn-edit:active { transform: translateY(0); }
 
-.btn-delete { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(239,68,68,0.25); }
-.btn-delete:hover { filter: brightness(1.03); transform: translateY(-1px); box-shadow: 0 10px 18px rgba(239,68,68,0.35); }
+.btn-delete { background: #ffffff; color: #2563eb; border-color: #1e40af; box-shadow: 0 2px 8px rgba(2,6,23,0.06); }
+.btn-delete:hover { background: #eff6ff; }
 .btn-delete:active { transform: translateY(0); }
 
 /* Delete All (toolbar) specific */
@@ -303,15 +303,22 @@
 .modal-action:active { transform: translateY(0); }
 .modal-action:disabled { opacity: .55; cursor: not-allowed; filter: grayscale(.15); }
 
-/* Color variants */
-.modal-action.export-all { background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); color: #fff; border-color: rgba(37,99,235,.35); }
-.modal-action.export-pending { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #0f172a; }
-.modal-action.export-delivered { background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; border-color: rgba(22,163,74,.35); }
-.modal-action.export-cancelled { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; border-color: rgba(220,38,38,.35); }
-.modal-action.delete-selected { background: linear-gradient(135deg, #fb923c, #f97316); color: #111827; border-color: rgba(249,115,22,.35); }
-.modal-action.delete-delivered { background: linear-gradient(135deg, #fca5a5, #ef4444); color: #7f1d1d; border-color: rgba(239,68,68,.35); }
-.modal-action.delete-cancelled { background: linear-gradient(135deg, #7f1d1d, #991b1b); color: #fff; border-color: rgba(153,27,27,.45); }
-.modal-action.delete-all { background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; border-color: rgba(185,28,28,.45); }
+/* Color variants (normalized to blue + white theme) */
+.modal-action.export-all,
+.modal-action.export-pending,
+.modal-action.export-delivered,
+.modal-action.export-cancelled,
+.modal-action.delete-selected,
+.modal-action.delete-delivered,
+.modal-action.delete-cancelled,
+.modal-action.delete-all {
+  background: #ffffff;
+  color: #1e3a8a; /* blue-800 */
+  border-color: #bfdbfe; /* blue-200 */
+}
+/* Hover/active states unified */
+.modal-action:hover { background: #2563eb; color: #ffffff; border-color: #1e40af; }
+.modal-action .arrow { color: inherit; }
 
 /* Professional button styles */
 .add-order-btn {
